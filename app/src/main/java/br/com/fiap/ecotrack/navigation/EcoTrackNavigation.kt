@@ -1,6 +1,10 @@
 package br.com.fiap.ecotrack.navigation
 
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -8,6 +12,8 @@ import br.com.fiap.ecotrack.ui.screens.*
 
 @Composable
 fun EcoTrackNavigation(navController: NavHostController) {
+    val context = LocalContext.current
+    
     NavHost(
         navController = navController,
         startDestination = "welcome"
@@ -18,13 +24,13 @@ fun EcoTrackNavigation(navController: NavHostController) {
                     navController.navigate("home")
                 },
                 onGoogleLogin = {
-                    navController.navigate("home")
+                    openSocialLogin(context, "https://accounts.google.com/signin")
                 },
                 onFacebookLogin = {
-                    navController.navigate("home")
+                    openSocialLogin(context, "https://www.facebook.com/login")
                 },
                 onAppleLogin = {
-                    navController.navigate("home")
+                    openSocialLogin(context, "https://appleid.apple.com/sign-in")
                 },
                 onHelpClick = {
                     // Implementar tela de ajuda
@@ -83,5 +89,18 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 }
             )
         }
+    }
+}
+
+private fun openSocialLogin(context: Context, url: String) {
+    try {
+        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        // Se não conseguir abrir o link, pode implementar um fallback
+        // Por exemplo, mostrar uma mensagem ou abrir no navegador padrão
+        val fallbackIntent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
+        fallbackIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(fallbackIntent)
     }
 }

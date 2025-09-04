@@ -35,7 +35,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(EcoDark)
-            .padding(16.dp)
+            .padding(start = 16.dp, end = 16.dp, top = 48.dp),
     ) {
         // Header
         Row(

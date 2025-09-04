@@ -1,17 +1,21 @@
 package br.com.fiap.ecotrack.ui.screens
 
+import android.content.Intent
+import android.net.Uri
+import android.widget.ImageView
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Help
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -20,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.fiap.ecotrack.R
 import br.com.fiap.ecotrack.ui.theme.EcoTrackTheme
-import br.com.fiap.ecotrack.ui.theme.EcoGreen
 import br.com.fiap.ecotrack.ui.theme.EcoDark
 import br.com.fiap.ecotrack.ui.theme.EcoTextPrimary
 
@@ -37,7 +40,7 @@ fun WelcomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(EcoDark)
-            .padding(24.dp),
+            .padding(start = 16.dp, end = 16.dp, top = 48.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         // Header com título e botão de ajuda
@@ -47,7 +50,6 @@ fun WelcomeScreen(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Spacer(modifier = Modifier.weight(1f))
-            
             Text(
                 text = "EcoTrack",
                 color = EcoTextPrimary,
@@ -56,7 +58,6 @@ fun WelcomeScreen(
             )
             
             Spacer(modifier = Modifier.weight(1f))
-            
             IconButton(
                 onClick = onHelpClick,
                 modifier = Modifier
@@ -67,19 +68,27 @@ fun WelcomeScreen(
                     )
             ) {
                 Icon(
-                    imageVector = Icons.Default.Help,
+                    imageVector = Icons.AutoMirrored.Filled.Help,
                     contentDescription = "Ajuda",
                     tint = EcoDark,
                     modifier = Modifier.size(20.dp)
                 )
             }
         }
-        
-        Spacer(modifier = Modifier.height(80.dp))
-        
+        Spacer(modifier = Modifier.height(30.dp))
+        Image(
+            painter = painterResource(id = R.drawable.ecotracklogo),
+            contentDescription = "Logo do EcoTrack",
+            modifier = Modifier
+                .size(200.dp)
+                .clip(RoundedCornerShape(16.dp))
+                .padding(end = 40.dp),
+        )
+
+        Spacer(modifier = Modifier.height(0.dp))
         // Título principal
         Text(
-            text = "Welcome to EcoTrack",
+            text = "Bem Vindo ao EcoTrack",
             color = EcoTextPrimary,
             fontSize = 32.sp,
             fontWeight = FontWeight.Bold,
@@ -87,10 +96,9 @@ fun WelcomeScreen(
         )
         
         Spacer(modifier = Modifier.height(16.dp))
-        
         // Descrição
         Text(
-            text = "Track your daily choices and reduce your CO₂ footprint.",
+            text = "Acompanhe suas escolhas diárias e reduza sua pegada de CO₂.",
             color = EcoTextPrimary,
             fontSize = 16.sp,
             textAlign = TextAlign.Center,
@@ -98,7 +106,6 @@ fun WelcomeScreen(
         )
         
         Spacer(modifier = Modifier.height(60.dp))
-        
         // Botão Get Started
         Button(
             onClick = onGetStartedClick,
@@ -112,35 +119,32 @@ fun WelcomeScreen(
             shape = RoundedCornerShape(12.dp)
         ) {
             Text(
-                text = "Get Started",
+                text = "Vamos começar",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium
             )
         }
         
         Spacer(modifier = Modifier.height(24.dp))
-        
         // Botões de login social
         SocialLoginButton(
-            text = "Continue with Google",
+            text = "Logar com Google",
             onClick = onGoogleLogin,
-            icon = "G"
+            iconRes = R.drawable.google
         )
         
         Spacer(modifier = Modifier.height(12.dp))
-        
         SocialLoginButton(
-            text = "Continue with Facebook",
+            text = "Logar com Facebook",
             onClick = onFacebookLogin,
-            icon = "f"
+            iconRes = R.drawable.facebook
         )
         
         Spacer(modifier = Modifier.height(12.dp))
-        
         SocialLoginButton(
-            text = "Continue with Apple",
+            text = "Logar com Apple",
             onClick = onAppleLogin,
-            icon = "🍎"
+            iconRes = R.drawable.apple
         )
     }
 }
@@ -149,7 +153,7 @@ fun WelcomeScreen(
 fun SocialLoginButton(
     text: String,
     onClick: () -> Unit,
-    icon: String
+    iconRes: Int
 ) {
     OutlinedButton(
         onClick = onClick,
@@ -159,17 +163,18 @@ fun SocialLoginButton(
         colors = ButtonDefaults.outlinedButtonColors(
             contentColor = EcoTextPrimary
         ),
-
         shape = RoundedCornerShape(12.dp)
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Start
         ) {
-            Text(
-                text = icon,
-                fontSize = 20.sp,
-                modifier = Modifier.padding(end = 12.dp)
+            Image(
+                painter = painterResource(id = iconRes),
+                contentDescription = text,
+                modifier = Modifier
+                    .size(35.dp)
+                    .padding(end = 12.dp)
             )
             Text(
                 text = text,

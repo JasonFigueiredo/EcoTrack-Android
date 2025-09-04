@@ -61,7 +61,20 @@ fun EcoTrackNavigation(navController: NavHostController) {
                     navController.popBackStack()
                 },
                 onAddTransport = {
-                    // Implementar tela de adicionar transporte
+                    navController.navigate("add_transport")
+                }
+            )
+        }
+        
+        composable("add_transport") {
+            AddTransportScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onSaveTransport = { transportData ->
+                    // Aqui você pode salvar os dados do transporte
+                    // Por enquanto, apenas volta para a tela anterior
+                    navController.popBackStack()
                 }
             )
         }

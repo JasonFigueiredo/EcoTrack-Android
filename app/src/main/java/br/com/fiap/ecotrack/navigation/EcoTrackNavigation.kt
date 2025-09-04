@@ -16,8 +16,16 @@ fun EcoTrackNavigation(navController: NavHostController) {
     
     NavHost(
         navController = navController,
-        startDestination = "welcome"
+        startDestination = "intro"
     ) {
+        composable("intro") {
+            IntroScreen(
+                onContinue = {
+                    navController.navigate("welcome")
+                }
+            )
+        }
+        
         composable("welcome") {
             WelcomeScreen(
                 onGetStartedClick = {

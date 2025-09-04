@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.material3.LinearProgressIndicator
@@ -108,6 +109,22 @@ fun HomeScreen(
                         }
                     }
                 )
+            }
+            
+            // Resumo de Impacto Total
+            item {
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                Text(
+                    text = "Resumo Rápido de Impacto Total (Aproximado)",
+                    color = EcoTextPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                ImpactSummaryTable()
             }
         }
     }
@@ -241,6 +258,210 @@ data class ActivityItem(
     val color: Color,
     val co2Amount: String
 )
+
+@Composable
+fun ImpactSummaryTable() {
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = EcoDarkSurface
+        ),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            // Header da tabela
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Ação",
+                    color = EcoTextPrimary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(2f)
+                )
+                Text(
+                    text = "1 Semana",
+                    color = EcoTextPrimary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "1 Mês",
+                    color = EcoTextPrimary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+                Text(
+                    text = "1 Ano",
+                    color = EcoTextPrimary,
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.weight(1f),
+                    textAlign = TextAlign.Center
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            // Linha separadora
+            HorizontalDivider(
+                color = EcoTextSecondary.copy(alpha = 0.3f),
+                thickness = 1.dp
+            )
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            // Dados da tabela
+            getImpactData().forEach { impactItem ->
+                ImpactTableRow(impactItem = impactItem)
+                if (impactItem != getImpactData().last()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun ImpactTableRow(impactItem: ImpactItem) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        // Ícone e nome da ação
+        Row(
+            modifier = Modifier.weight(2f),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = impactItem.icon,
+                contentDescription = impactItem.action,
+                tint = impactItem.color,
+                modifier = Modifier.size(16.dp)
+            )
+            Spacer(modifier = Modifier.width(8.dp))
+            Text(
+                text = impactItem.action,
+                color = EcoTextPrimary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+        
+        // 1 Semana
+        Text(
+            text = impactItem.oneWeek,
+            color = EcoTextSecondary,
+            fontSize = 11.sp,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+        
+        // 1 Mês
+        Text(
+            text = impactItem.oneMonth,
+            color = EcoTextSecondary,
+            fontSize = 11.sp,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+        
+        // 1 Ano
+        Text(
+            text = impactItem.oneYear,
+            color = EcoTextSecondary,
+            fontSize = 11.sp,
+            modifier = Modifier.weight(1f),
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+data class ImpactItem(
+    val action: String,
+    val icon: ImageVector,
+    val color: Color,
+    val oneWeek: String,
+    val oneMonth: String,
+    val oneYear: String
+)
+
+fun getImpactData(): List<ImpactItem> {
+    return listOf(
+        ImpactItem(
+            action = "Transporte sustentável",
+            icon = Icons.Default.DirectionsCar,
+            color = EcoGreen,
+            oneWeek = "~15 kg",
+            oneMonth = "~60 kg",
+            oneYear = "~700 kg"
+        ),
+        ImpactItem(
+            action = "Caminhar/pedalar",
+            icon = Icons.AutoMirrored.Filled.DirectionsWalk,
+            color = EcoGreenLight,
+            oneWeek = "~2 kg",
+            oneMonth = "~10 kg",
+            oneYear = "~120 kg"
+        ),
+        ImpactItem(
+            action = "Transporte público",
+            icon = Icons.Default.DirectionsBus,
+            color = EcoGreenAccent,
+            oneWeek = "~20 kg",
+            oneMonth = "~80 kg",
+            oneYear = "~900 kg"
+        ),
+        ImpactItem(
+            action = "Reduzir carne vermelha",
+            icon = Icons.Default.Restaurant,
+            color = EcoGreen,
+            oneWeek = "~10 kg",
+            oneMonth = "~90 kg",
+            oneYear = "~1000 kg"
+        ),
+        ImpactItem(
+            action = "Economizar energia",
+            icon = Icons.Default.ElectricalServices,
+            color = EcoGreenLight,
+            oneWeek = "~2-5 kg",
+            oneMonth = "~30 kg",
+            oneYear = "~600 kg"
+        ),
+        ImpactItem(
+            action = "Reciclagem",
+            icon = Icons.Default.Recycling,
+            color = EcoGreenAccent,
+            oneWeek = "~3 kg",
+            oneMonth = "~15 kg",
+            oneYear = "~180 kg"
+        ),
+        ImpactItem(
+            action = "Reflorestamento",
+            icon = Icons.Default.Park,
+            color = EcoGreen,
+            oneWeek = "-",
+            oneMonth = "~80 kg",
+            oneYear = "~1000 kg"
+        ),
+        ImpactItem(
+            action = "Consumo consciente",
+            icon = Icons.Default.ShoppingCart,
+            color = EcoGreenLight,
+            oneWeek = "~5-10 kg",
+            oneMonth = "~40 kg",
+            oneYear = "~500 kg"
+        )
+    )
+}
 
 fun getActivityItems(): List<ActivityItem> {
     return listOf(

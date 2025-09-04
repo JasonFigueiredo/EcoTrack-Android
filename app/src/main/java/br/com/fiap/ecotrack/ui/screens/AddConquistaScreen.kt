@@ -9,12 +9,13 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
@@ -289,7 +290,7 @@ fun DetailedStatsGrid() {
                 title = "Meta Semanal",
                 value = "85%",
                 subtitle = "15/18 metas atingidas",
-                icon = Icons.Default.TrendingUp,
+                icon = Icons.AutoMirrored.Filled.TrendingUp,
                 color = EcoGreen,
                 modifier = Modifier.weight(1f)
             )
@@ -599,10 +600,11 @@ fun BadgeDetailDialog(
                     )
                     Spacer(modifier = Modifier.height(8.dp))
                     LinearProgressIndicator(
-                        progress = badge.progressCurrent.toFloat() / badge.progressRequired.toFloat(),
-                        modifier = Modifier.fillMaxWidth(),
-                        color = badge.color,
-                        trackColor = EcoTextSecondary.copy(alpha = 0.3f)
+                    progress = { badge.progressCurrent.toFloat() / badge.progressRequired.toFloat() },
+                    modifier = Modifier.fillMaxWidth(),
+                    color = badge.color,
+                    trackColor = EcoTextSecondary.copy(alpha = 0.3f),
+                    strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                 }

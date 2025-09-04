@@ -25,7 +25,9 @@ import br.com.fiap.ecotrack.ui.theme.*
 fun ProfileScreen(
     onBackClick: () -> Unit = {},
     onOpenGoals: () -> Unit = {},
-    onOpenConquistas: () -> Unit = {}
+    onOpenConquistas: () -> Unit = {},
+    onOpenAjuda: () -> Unit = {},
+    onOpenSobre: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -82,6 +84,8 @@ fun ProfileScreen(
                     val onClick: () -> Unit = when (item.title) {
                         "Metas" -> onOpenGoals
                         "Conquistas" -> onOpenConquistas
+                        "Ajuda" -> onOpenAjuda
+                        "Sobre" -> onOpenSobre
                         else -> ({})
                     }
                     ProfileItemCard(item = item, onClick = onClick)

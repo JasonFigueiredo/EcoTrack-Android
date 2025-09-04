@@ -140,6 +140,12 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 },
                 onOpenConquistas = {
                     navController.navigate("add_conquista")
+                },
+                onOpenAjuda = {
+                    navController.navigate("add_ajuda")
+                },
+                onOpenSobre = {
+                    navController.navigate("add_sobre")
                 }
             )
         }
@@ -154,6 +160,22 @@ fun EcoTrackNavigation(navController: NavHostController) {
 
         composable("add_conquista") {
             AddConquistaScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable("add_ajuda") {
+            AddAjudaScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable("add_sobre") {
+            AddSobreScreen(
                 onBackClick = {
                     navController.popBackStack()
                 }

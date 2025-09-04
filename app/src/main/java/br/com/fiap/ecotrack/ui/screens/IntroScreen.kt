@@ -119,7 +119,7 @@ fun IntroScreen(
                 )
             }
             
-            Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             
             // Page indicators
             Row(

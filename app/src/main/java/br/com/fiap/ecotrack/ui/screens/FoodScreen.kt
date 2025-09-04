@@ -6,6 +6,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -22,7 +23,8 @@ import br.com.fiap.ecotrack.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FoodScreen(
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onAddFood: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -44,6 +46,15 @@ fun FoodScreen(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Voltar",
                         tint = EcoTextPrimary
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = onAddFood) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Help,
+                        contentDescription = "Adicionar",
+                        tint = EcoGreen
                     )
                 }
             },

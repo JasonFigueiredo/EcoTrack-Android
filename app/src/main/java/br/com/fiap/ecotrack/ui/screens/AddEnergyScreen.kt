@@ -1,6 +1,5 @@
 package br.com.fiap.ecotrack.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -22,10 +21,11 @@ import androidx.compose.ui.unit.sp
 import br.com.fiap.ecotrack.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
+
 @Composable
-fun AddTransportScreen(
+fun AddEnergyScreen(
     onBackClick: () -> Unit = {},
-    onSaveTransport: () -> Unit = {}
+    onSaveEnergy: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -37,7 +37,7 @@ fun AddTransportScreen(
         TopAppBar(
             title = {
                 Text(
-                    text = "Consumo por Transporte",
+                    text = "Consumo de Energia",
                     color = EcoTextPrimary,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
@@ -64,7 +64,7 @@ fun AddTransportScreen(
         ) {
             // Título da seção
             Text(
-                text = "Tipos de Transporte",
+                text = "Tipos de Energia",
                 color = EcoTextPrimary,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
@@ -76,18 +76,17 @@ fun AddTransportScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                items(getTransportTypes()) { transportType ->
-                    TransportTypeCard(transportType = transportType)
+                items(getEnergyTypes()) { energyType ->
+                    EnergyTypeCard(energyType = energyType)
                 }
             }
-
         }
     }
 }
 
 @Composable
-fun TransportTypeCard(
-    transportType: TransportType
+fun EnergyTypeCard(
+    energyType: EnergyType
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -101,9 +100,9 @@ fun TransportTypeCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = transportType.icon,
-                contentDescription = transportType.name,
-                tint = transportType.color,
+                imageVector = energyType.icon,
+                contentDescription = energyType.name,
+                tint = energyType.color,
                 modifier = Modifier.size(32.dp)
             )
             
@@ -111,13 +110,13 @@ fun TransportTypeCard(
             
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = transportType.name,
+                    text = energyType.name,
                     color = EcoTextPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "${transportType.co2PerKm} kg CO₂/km",
+                    text = "${energyType.consumptionPerHour} kWh/hora",
                     color = EcoTextSecondary,
                     fontSize = 12.sp
                 )
@@ -127,76 +126,94 @@ fun TransportTypeCard(
 }
 
 // Data class
-data class TransportType(
+data class EnergyType(
     val name: String,
     val icon: ImageVector,
     val color: Color,
-    val co2PerKm: Double // kg CO2 por km
+    val consumptionPerHour: Double // kWh por hora
 )
 
-fun getTransportTypes(): List<TransportType> {
+fun getEnergyTypes(): List<EnergyType> {
     return listOf(
-        TransportType(
-            name = "Carro (Gasolina)",
-            icon = Icons.Default.DirectionsCar,
+        EnergyType(
+            name = "Ar Condicionado",
+            icon = Icons.Default.AcUnit,
             color = EcoGreen,
-            co2PerKm = 0.192 // kg CO2 por km
+            consumptionPerHour = 1.5 // kWh por hora
         ),
-        TransportType(
-            name = "Carro (Diesel)",
-            icon = Icons.Default.DirectionsCar,
+        EnergyType(
+            name = "Geladeira",
+            icon = Icons.Default.Kitchen,
             color = EcoGreenLight,
-            co2PerKm = 0.171 // kg CO2 por km
+            consumptionPerHour = 0.8 // kWh por hora
         ),
-        TransportType(
-            name = "Carro (Elétrico)",
-            icon = Icons.Default.ElectricCar,
+        EnergyType(
+            name = "Micro-ondas",
+            icon = Icons.Default.Microwave,
             color = EcoGreenAccent,
-            co2PerKm = 0.053 // kg CO2 por km
+            consumptionPerHour = 1.2 // kWh por hora
         ),
-        TransportType(
-            name = "Ônibus",
-            icon = Icons.Default.DirectionsBus,
+        EnergyType(
+            name = "Lavadora",
+            icon = Icons.Default.LocalLaundryService,
             color = EcoGreen,
-            co2PerKm = 0.089 // kg CO2 por km
+            consumptionPerHour = 2.0 // kWh por hora
         ),
-        TransportType(
-            name = "Metrô/Trem",
-            icon = Icons.Default.Train,
+        EnergyType(
+            name = "Secadora",
+            icon = Icons.Default.DryCleaning,
             color = EcoGreenLight,
-            co2PerKm = 0.041 // kg CO2 por km
+            consumptionPerHour = 3.5 // kWh por hora
         ),
-        TransportType(
-            name = "Bicicleta",
-            icon = Icons.Default.PedalBike,
+        EnergyType(
+            name = "Forno Elétrico",
+            icon = Icons.Default.LocalPizza,
             color = EcoGreenAccent,
-            co2PerKm = 0.0 // kg CO2 por km (zero emissões)
+            consumptionPerHour = 2.5 // kWh por hora
         ),
-        TransportType(
-            name = "Caminhada",
-            icon = Icons.Default.DirectionsWalk,
+        EnergyType(
+            name = "Chuveiro Elétrico",
+            icon = Icons.Default.Shower,
             color = EcoGreen,
-            co2PerKm = 0.0 // kg CO2 por km (zero emissões)
+            consumptionPerHour = 4.5 // kWh por hora
         ),
-        TransportType(
-            name = "Avião",
-            icon = Icons.Default.Flight,
+        EnergyType(
+            name = "Computador",
+            icon = Icons.Default.Computer,
             color = EcoGreenLight,
-            co2PerKm = 0.285 // kg CO2 por km
+            consumptionPerHour = 0.3 // kWh por hora
         ),
-        TransportType(
-            name = "Moto",
-            icon = Icons.Default.TwoWheeler,
+        EnergyType(
+            name = "TV",
+            icon = Icons.Default.Tv,
             color = EcoGreenAccent,
-            co2PerKm = 0.113 // kg CO2 por km
+            consumptionPerHour = 0.2 // kWh por hora
+        ),
+        EnergyType(
+            name = "Iluminação LED",
+            icon = Icons.Default.Lightbulb,
+            color = EcoGreen,
+            consumptionPerHour = 0.1 // kWh por hora
+        ),
+        EnergyType(
+            name = "Carregador de Celular",
+            icon = Icons.Default.BatteryChargingFull,
+            color = EcoGreenLight,
+            consumptionPerHour = 0.05 // kWh por hora
+        ),
+        EnergyType(
+            name = "Aspirador de Pó",
+            icon = Icons.Default.CleaningServices,
+            color = EcoGreenAccent,
+            consumptionPerHour = 1.8 // kWh por hora
         )
     )
 }
 
 @Preview(showBackground = true)
 @Composable
-fun AddTransportScreenPreview() {
+fun AddEnergyScreenPreview() {
     EcoTrackTheme {
-        AddTransportScreen()
+        AddEnergyScreen()
     }
 }

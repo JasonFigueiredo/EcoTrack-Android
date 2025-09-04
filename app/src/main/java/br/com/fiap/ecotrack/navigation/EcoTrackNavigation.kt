@@ -65,24 +65,42 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 }
             )
         }
-        
+
         composable("add_transport") {
             AddTransportScreen(
                 onBackClick = {
                     navController.popBackStack()
                 },
-                onSaveTransport = { transportData ->
-                    // Aqui você pode salvar os dados do transporte
-                    // Por enquanto, apenas volta para a tela anterior
-                    navController.popBackStack()
+                onSaveTransport = {
+                    // Apenas navega de volta para a tela de transporte sem parâmetros
+                    navController.navigate("transport") {
+                        popUpTo("transport") { inclusive = true }
+                    }
                 }
             )
         }
-        
+
         composable("energy") {
             EnergyScreen(
                 onBackClick = {
                     navController.popBackStack()
+                },
+                onAddEnergy = {
+                    navController.navigate("add_energy")
+                }
+            )
+        }
+
+        composable("add_energy") {
+            AddEnergyScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onSaveEnergy = {
+                    // Apenas navega de volta para a tela de energia sem parâmetros
+                    navController.navigate("energy") {
+                        popUpTo("energy") { inclusive = true }
+                    }
                 }
             )
         }
@@ -91,12 +109,51 @@ fun EcoTrackNavigation(navController: NavHostController) {
             FoodScreen(
                 onBackClick = {
                     navController.popBackStack()
+                },
+                onAddFood = {
+                    navController.navigate("add_food")
+                }
+            )
+        }
+
+        composable("add_food") {
+            AddFoodScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onSaveFood = {
+                    // Apenas navega de volta para a tela de alimentação sem parâmetros
+                    navController.navigate("food") {
+                        popUpTo("food") { inclusive = true }
+                    }
                 }
             )
         }
         
         composable("profile") {
             ProfileScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onOpenGoals = {
+                    navController.navigate("add_meta")
+                },
+                onOpenConquistas = {
+                    navController.navigate("add_conquista")
+                }
+            )
+        }
+
+        composable("add_meta") {
+            AddMetaScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable("add_conquista") {
+            AddConquistaScreen(
                 onBackClick = {
                     navController.popBackStack()
                 }

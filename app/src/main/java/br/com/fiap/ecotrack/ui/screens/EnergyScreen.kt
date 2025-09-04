@@ -6,14 +6,17 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -22,13 +25,15 @@ import br.com.fiap.ecotrack.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun EnergyScreen(
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onAddEnergy: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
             .background(EcoDark)
     ) {
+        // Top App Bar
         TopAppBar(
             title = {
                 Text(
@@ -47,6 +52,15 @@ fun EnergyScreen(
                     )
                 }
             },
+            actions = {
+                IconButton(onClick = onAddEnergy) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.Help,
+                        contentDescription = "Adicionar",
+                        tint = EcoGreen
+                    )
+                }
+            },
             colors = TopAppBarDefaults.topAppBarColors(
                 containerColor = EcoDark
             )
@@ -57,12 +71,14 @@ fun EnergyScreen(
                 .fillMaxSize()
                 .padding(16.dp)
         ) {
+            // Resumo do dia
             EnergySummaryCard()
             
             Spacer(modifier = Modifier.height(24.dp))
             
+            // Lista de energias
             Text(
-                text = "Consumo de Hoje",
+                text = "Hoje",
                 color = EcoTextPrimary,
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold
@@ -100,13 +116,13 @@ fun EnergySummaryCard() {
             ) {
                 Column {
                     Text(
-                        text = "CO₂ da Energia",
+                        text = "Consumo de Energia",
                         color = EcoTextSecondary,
                         fontSize = 14.sp
                     )
                     Text(
-                        text = "2.1 kg",
-                        color = EcoGreenLight,
+                        text = "12.5 kWh",
+                        color = EcoGreen,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold
                     )
@@ -114,19 +130,60 @@ fun EnergySummaryCard() {
                 
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "Consumo",
+                        text = "Custo",
                         color = EcoTextSecondary,
                         fontSize = 14.sp
                     )
                     Text(
-                        text = "15.2 kWh",
+                        text = "R$ 8.75",
                         color = EcoTextPrimary,
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium
                     )
                 }
             }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Gráfico de barras simples
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.Bottom
+            ) {
+                EnergyBar("Ar Cond.", 0.6f, EcoGreen)
+                EnergyBar("Geladeira", 0.4f, EcoGreenLight)
+                EnergyBar("TV", 0.2f, EcoGreenAccent)
+            }
         }
+    }
+}
+
+@Composable
+fun EnergyBar(
+    label: String,
+    height: Float,
+    color: Color
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Box(
+            modifier = Modifier
+                .width(40.dp)
+                .height((height * 60).dp)
+                .background(
+                    color = color,
+                    shape = RoundedCornerShape(4.dp)
+                )
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        Text(
+            text = label,
+            color = EcoTextSecondary,
+            fontSize = 10.sp,
+            textAlign = TextAlign.Center
+        )
     }
 }
 
@@ -170,13 +227,13 @@ fun EnergyCard(
             
             Column(horizontalAlignment = Alignment.End) {
                 Text(
-                    text = energy.co2Amount,
+                    text = energy.consumption,
                     color = energy.color,
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = energy.consumption,
+                    text = energy.duration,
                     color = EcoTextSecondary,
                     fontSize = 12.sp
                 )
@@ -190,27 +247,35 @@ data class EnergyItem(
     val details: String,
     val icon: ImageVector,
     val color: Color,
-    val co2Amount: String,
-    val consumption: String
+    val consumption: String,
+    val duration: String
 )
 
 fun getEnergyItems(): List<EnergyItem> {
     return listOf(
         EnergyItem(
-            type = "Eletricidade",
-            details = "Iluminação e eletrodomésticos",
-            icon = Icons.Default.ElectricalServices,
-            color = EcoGreenLight,
-            co2Amount = "1.5 kg",
-            consumption = "12.0 kWh"
+            type = "Ar Condicionado",
+            details = "Sala de estar",
+            icon = Icons.Default.AcUnit,
+            color = EcoGreen,
+            consumption = "4.5 kWh",
+            duration = "3 horas"
         ),
         EnergyItem(
-            type = "Gás",
-            details = "Aquecimento e cozinha",
-            icon = Icons.Default.LocalFireDepartment,
+            type = "Geladeira",
+            details = "Cozinha",
+            icon = Icons.Default.Kitchen,
+            color = EcoGreenLight,
+            consumption = "2.4 kWh",
+            duration = "24 horas"
+        ),
+        EnergyItem(
+            type = "TV",
+            details = "Sala de estar",
+            icon = Icons.Default.Tv,
             color = EcoGreenAccent,
-            co2Amount = "0.6 kg",
-            consumption = "3.2 kWh"
+            consumption = "0.6 kWh",
+            duration = "3 horas"
         )
     )
 }

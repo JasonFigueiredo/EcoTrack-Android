@@ -23,7 +23,9 @@ import br.com.fiap.ecotrack.ui.theme.*
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    onBackClick: () -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onOpenGoals: () -> Unit = {},
+    onOpenConquistas: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -77,7 +79,12 @@ fun ProfileScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(getProfileItems()) { item ->
-                    ProfileItemCard(item = item)
+                    val onClick: () -> Unit = when (item.title) {
+                        "Metas" -> onOpenGoals
+                        "Conquistas" -> onOpenConquistas
+                        else -> ({})
+                    }
+                    ProfileItemCard(item = item, onClick = onClick)
                 }
             }
         }
@@ -169,7 +176,8 @@ fun StatisticItem(
 
 @Composable
 fun ProfileItemCard(
-    item: ProfileItem
+    item: ProfileItem,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -196,15 +204,19 @@ fun ProfileItemCard(
                 color = EcoTextPrimary,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier
+                    .weight(1f)
+                    .let { it }
             )
             
-            Icon(
-                imageVector = Icons.Default.ChevronRight,
-                contentDescription = "Ir para",
-                tint = EcoTextSecondary,
-                modifier = Modifier.size(20.dp)
-            )
+            IconButton(onClick = onClick) {
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = "Ir para",
+                    tint = EcoTextSecondary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
         }
     }
 }

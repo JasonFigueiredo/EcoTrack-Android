@@ -31,7 +31,7 @@ fun IntroScreen(
     onContinue: () -> Unit = {}
 ) {
     val pagerState = rememberPagerState(pageCount = { 5 })
-    var currentPage by remember { mutableStateOf(0) }
+    var currentPage by remember { mutableIntStateOf(0) }
     
     // Auto-scroll effect
     LaunchedEffect(pagerState) {

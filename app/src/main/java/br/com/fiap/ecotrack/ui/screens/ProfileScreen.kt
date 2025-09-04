@@ -37,6 +37,7 @@ fun ProfileScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(EcoDark)
+            .padding(bottom = 30.dp)
     ) {
         TopAppBar(
             title = {

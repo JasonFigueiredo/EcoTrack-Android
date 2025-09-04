@@ -95,12 +95,6 @@ fun EcoTrackNavigation(navController: NavHostController) {
             AddEnergyScreen(
                 onBackClick = {
                     navController.popBackStack()
-                },
-                onSaveEnergy = {
-                    // Apenas navega de volta para a tela de energia sem parâmetros
-                    navController.navigate("energy") {
-                        popUpTo("energy") { inclusive = true }
-                    }
                 }
             )
         }
@@ -141,11 +135,17 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 onOpenConquistas = {
                     navController.navigate("add_conquista")
                 },
+                onOpenHistorico = {
+                    navController.navigate("add_historico")
+                },
                 onOpenAjuda = {
                     navController.navigate("add_ajuda")
                 },
                 onOpenSobre = {
                     navController.navigate("add_sobre")
+                },
+                onOpenConfig = {
+                    navController.navigate("add_config")
                 }
             )
         }
@@ -176,6 +176,22 @@ fun EcoTrackNavigation(navController: NavHostController) {
 
         composable("add_sobre") {
             AddSobreScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable("add_historico") {
+            AddHistoricoScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable("add_config") {
+            AddConfigScreen(
                 onBackClick = {
                     navController.popBackStack()
                 }

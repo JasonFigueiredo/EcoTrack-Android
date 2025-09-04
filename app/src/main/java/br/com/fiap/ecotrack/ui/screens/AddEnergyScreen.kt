@@ -24,8 +24,7 @@ import br.com.fiap.ecotrack.ui.theme.*
 
 @Composable
 fun AddEnergyScreen(
-    onBackClick: () -> Unit = {},
-    onSaveEnergy: () -> Unit = {}
+    onBackClick: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier

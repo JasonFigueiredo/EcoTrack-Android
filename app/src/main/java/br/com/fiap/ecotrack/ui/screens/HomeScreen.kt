@@ -9,6 +9,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -152,13 +153,14 @@ fun CO2SummaryCard() {
             
             // Barra de progresso
             LinearProgressIndicator(
-                progress = 0.6f,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp)),
-                color = EcoGreen,
-                trackColor = EcoDarkSurfaceVariant
+            progress = { 0.6f },
+            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(4.dp)),
+            color = EcoGreen,
+            trackColor = EcoDarkSurfaceVariant,
+            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
             )
             
             Spacer(modifier = Modifier.height(8.dp))

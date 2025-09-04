@@ -1,6 +1,5 @@
 package br.com.fiap.ecotrack.ui.screens
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -8,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -174,9 +174,9 @@ fun getTransportTypes(): List<TransportType> {
         ),
         TransportType(
             name = "Caminhada",
-            icon = Icons.Default.DirectionsWalk,
             color = EcoGreen,
-            co2PerKm = 0.0 // kg CO2 por km (zero emissões)
+            co2PerKm = 0.0, // kg CO2 por km (zero emissões)
+            icon = Icons.AutoMirrored.Filled.DirectionsWalk
         ),
         TransportType(
             name = "Avião",

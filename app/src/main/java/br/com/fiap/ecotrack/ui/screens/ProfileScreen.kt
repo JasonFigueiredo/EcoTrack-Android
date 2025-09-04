@@ -7,6 +7,8 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.Help
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -27,7 +29,9 @@ fun ProfileScreen(
     onOpenGoals: () -> Unit = {},
     onOpenConquistas: () -> Unit = {},
     onOpenAjuda: () -> Unit = {},
-    onOpenSobre: () -> Unit = {}
+    onOpenSobre: () -> Unit = {},
+    onOpenHistorico: () -> Unit = {},
+    onOpenConfig: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -46,9 +50,9 @@ fun ProfileScreen(
             navigationIcon = {
                 IconButton(onClick = onBackClick) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Voltar",
-                        tint = EcoTextPrimary
+                        tint = EcoTextPrimary,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack
                     )
                 }
             },
@@ -82,8 +86,10 @@ fun ProfileScreen(
             ) {
                 items(getProfileItems()) { item ->
                     val onClick: () -> Unit = when (item.title) {
+                        "Configurações" -> onOpenConfig
                         "Metas" -> onOpenGoals
                         "Conquistas" -> onOpenConquistas
+                        "Histórico" -> onOpenHistorico
                         "Ajuda" -> onOpenAjuda
                         "Sobre" -> onOpenSobre
                         else -> ({})
@@ -210,7 +216,6 @@ fun ProfileItemCard(
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
                     .weight(1f)
-                    .let { it }
             )
             
             IconButton(onClick = onClick) {
@@ -255,8 +260,8 @@ fun getProfileItems(): List<ProfileItem> {
         ),
         ProfileItem(
             title = "Ajuda",
-            icon = Icons.Default.Help,
-            color = EcoTextSecondary
+            color = EcoTextSecondary,
+            icon = Icons.AutoMirrored.Filled.Help
         ),
         ProfileItem(
             title = "Sobre",

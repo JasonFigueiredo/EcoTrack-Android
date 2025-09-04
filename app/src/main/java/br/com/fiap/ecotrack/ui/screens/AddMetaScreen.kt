@@ -7,6 +7,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -230,8 +231,8 @@ fun getMetaItems(): List<MetaItem> {
         MetaItem(
             title = "Optar por andar a pé ou de bicicleta",
             subtitle = "Priorizar deslocamentos curtos sem uso de veículos motorizados.",
-            icon = Icons.Default.DirectionsWalk,
-            color = EcoGreenLight
+            color = EcoGreenLight,
+            icon = Icons.AutoMirrored.Filled.DirectionsWalk
         ),
         MetaItem(
             title = "Utilizar transporte público sempre que possível",

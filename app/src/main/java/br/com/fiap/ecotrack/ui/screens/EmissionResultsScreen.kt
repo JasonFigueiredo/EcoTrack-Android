@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -65,38 +66,42 @@ fun EmissionResultsScreen(
             )
         )
         
-        // Conteúdo centralizado
-        Column(
+        // Conteúdo com scroll suave
+        LazyColumn(
+            state = rememberLazyListState(),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
+                .padding(horizontal = 16.dp)
+                .padding(top = 100.dp)
+                .padding(bottom = 45.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             // Resultado principal
-            MainEmissionResultCard(emissionComparison.selectedTransport)
-            
-            Spacer(modifier = Modifier.height(16.dp))
+            item {
+                MainEmissionResultCard(emissionComparison.selectedTransport)
+            }
             
             // Comparações e sugestões
             if (emissionComparison.savings.isNotEmpty()) {
-                Text(
-                    text = "Alternativas Mais Sustentáveis",
-                    color = EcoTextPrimary,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                item {
+                    Text(
+                        text = "Alternativas Mais Sustentáveis",
+                        color = EcoTextPrimary,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
                 
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                emissionComparison.savings.forEach { saving ->
+                items(emissionComparison.savings) { saving ->
                     AlternativeTransportCard(saving)
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
             
             // Dicas de sustentabilidade
-            SustainabilityTipsCard()
+            item {
+                SustainabilityTipsCard()
+            }
         }
     }
 }

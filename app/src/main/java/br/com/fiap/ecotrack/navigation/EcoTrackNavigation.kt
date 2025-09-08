@@ -166,7 +166,7 @@ fun EcoTrackNavigation(navController: NavHostController) {
             
             TelaResultadosEnergia(
                 comparacaoEnergia = comparacaoEnergia,
-                onVoltarClick = {
+                onBackClick = {
                     navController.popBackStack()
                 },
                 onCalcularNovo = {

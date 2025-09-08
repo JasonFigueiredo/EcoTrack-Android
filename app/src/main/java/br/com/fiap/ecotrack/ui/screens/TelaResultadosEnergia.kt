@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -26,14 +27,13 @@ import br.com.fiap.ecotrack.ui.theme.*
 @Composable
 fun TelaResultadosEnergia(
     comparacaoEnergia: ComparacaoEmissaoEnergia,
-    onVoltarClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
     onCalcularNovo: () -> Unit = {}
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(EcoDark)
-            .padding(bottom = 30.dp, top = 30.dp)
     ) {
         // Top App Bar
         TopAppBar(
@@ -46,11 +46,20 @@ fun TelaResultadosEnergia(
                 )
             },
             navigationIcon = {
-                IconButton(onClick = onVoltarClick) {
+                IconButton(onClick = onBackClick) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Voltar",
                         tint = EcoTextPrimary
+                    )
+                }
+            },
+            actions = {
+                IconButton(onClick = onCalcularNovo) {
+                    Icon(
+                        imageVector = Icons.Default.Refresh,
+                        contentDescription = "Novo Cálculo",
+                        tint = EcoGreen
                     )
                 }
             },
@@ -59,11 +68,14 @@ fun TelaResultadosEnergia(
             )
         )
         
-        // Conteúdo com scroll
+        // Conteúdo com scroll suave
         LazyColumn(
+            state = rememberLazyListState(),
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp)
+                .padding(top = 100.dp)
+                .padding(bottom = 45.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -89,54 +101,6 @@ fun TelaResultadosEnergia(
                 EnergyTipsCard(comparacaoEnergia.energiaSelecionada.tipoEnergia)
             }
             
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            
-            item {
-                // Botões de navegação
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    // Botão Voltar
-                    Button(
-                        onClick = onVoltarClick,
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = EcoDarkSurface,
-                            contentColor = EcoTextPrimary
-                        ),
-                        border = BorderStroke(1.dp, EcoGreen)
-                    ) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = "Voltar",
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Voltar")
-                    }
-                    
-                    // Botão Novo Cálculo
-                    Button(
-                        onClick = onCalcularNovo,
-                        modifier = Modifier.weight(1f),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = EcoGreen,
-                            contentColor = EcoTextOnGreen
-                        )
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Refresh,
-                            contentDescription = "Novo Cálculo",
-                            modifier = Modifier.size(18.dp)
-                        )
-                        Spacer(modifier = Modifier.width(8.dp))
-                        Text("Novo Cálculo")
-                    }
-                }
-            }
         }
     }
 }

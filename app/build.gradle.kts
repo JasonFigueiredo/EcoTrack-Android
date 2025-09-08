@@ -10,21 +10,26 @@ android {
 
     defaultConfig {
         applicationId = "br.com.fiap.ecotrack"
-        minSdk = 29
+        minSdk = 29 //android 10 em diante
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
-
+        resConfigs("pt", "en")
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a") // só arquiteturas móveis
+        }
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
     buildTypes {
         release {
-            isMinifyEnabled = false
+            isMinifyEnabled = true
+            isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
         }
     }
     compileOptions {
@@ -49,13 +54,14 @@ dependencies {
     implementation(libs.androidx.compose.ui.graphics)
     implementation(libs.androidx.compose.ui.tooling.preview)
     implementation(libs.androidx.compose.material3)
-    
+    implementation("io.coil-kt:coil-compose:2.4.0")
+
     // Navigation Compose
     implementation("androidx.navigation:navigation-compose:2.7.7")
-    
+
     // Icons
     implementation("androidx.compose.material:material-icons-extended:1.5.8")
-    
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

@@ -19,7 +19,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.com.fiap.ecotrack.R
 import br.com.fiap.ecotrack.ui.theme.*
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -215,22 +214,6 @@ fun getFoodTypes(): List<FoodType> {
         ),
         
         // Frutas e Vegetais
-        FoodType(
-            name = "Banana",
-            icon = Icons.Default.Cake, // ícone padrão como fallback
-            color = EcoGreenLight,
-            co2PerKg = 0.7, // kg CO2 por kg
-            isCustomIcon = true,
-            customIconResId = R.drawable.banana_icon
-        ),
-        FoodType(
-            name = "Maçã",
-            icon = Icons.Default.AcUnit, // ícone padrão como fallback
-            color = EcoGreenAccent,
-            co2PerKg = 0.4, // kg CO2 por kg
-            isCustomIcon = true,
-            customIconResId = R.drawable.apple_icon
-        ),
         FoodType(
             name = "Tomate",
             icon = Icons.Default.LocalPizza,

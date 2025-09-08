@@ -30,8 +30,7 @@ fun ProfileScreen(
     onOpenConquistas: () -> Unit = {},
     onOpenAjuda: () -> Unit = {},
     onOpenSobre: () -> Unit = {},
-    onOpenHistorico: () -> Unit = {},
-    onOpenConfig: () -> Unit = {}
+    onOpenHistorico: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -81,13 +80,12 @@ fun ProfileScreen(
             )
             
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             LazyColumn(
                 verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 items(getProfileItems()) { item ->
                     val onClick: () -> Unit = when (item.title) {
-                        "Configurações" -> onOpenConfig
                         "Metas" -> onOpenGoals
                         "Conquistas" -> onOpenConquistas
                         "Histórico" -> onOpenHistorico

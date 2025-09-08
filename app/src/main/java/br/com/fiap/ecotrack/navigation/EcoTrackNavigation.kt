@@ -13,19 +13,19 @@ import br.com.fiap.ecotrack.ui.screens.*
 @Composable
 fun EcoTrackNavigation(navController: NavHostController) {
     val context = LocalContext.current
-    
+
     NavHost(
         navController = navController,
         startDestination = "intro"
     ) {
-        composable("intro") {
+        composable("Intro") {
             IntroScreen(
                 onContinue = {
                     navController.navigate("welcome")
                 }
             )
         }
-        
+
         composable("welcome") {
             WelcomeScreen(
                 onGetStartedClick = {
@@ -39,9 +39,6 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 },
                 onAppleLogin = {
                     openSocialLogin(context, "https://appleid.apple.com/sign-in")
-                },
-                onHelpClick = {
-                    // Implementar tela de ajuda
                 }
             )
         }
@@ -143,19 +140,15 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 onOpenConquistas = {
                     navController.navigate("add_conquista")
                 },
-                onOpenHistorico = {
-                    navController.navigate("add_historico")
-                },
                 onOpenAjuda = {
                     navController.navigate("add_ajuda")
                 },
                 onOpenSobre = {
                     navController.navigate("add_sobre")
                 },
-                onOpenConfig = {
-                    navController.navigate("add_config")
-                }
-            )
+            ) {
+                navController.navigate("add_historico")
+            }
         }
 
         composable("add_meta") {
@@ -192,14 +185,6 @@ fun EcoTrackNavigation(navController: NavHostController) {
 
         composable("add_historico") {
             AddHistoricoScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                }
-            )
-        }
-
-        composable("add_config") {
-            AddConfigScreen(
                 onBackClick = {
                     navController.popBackStack()
                 }

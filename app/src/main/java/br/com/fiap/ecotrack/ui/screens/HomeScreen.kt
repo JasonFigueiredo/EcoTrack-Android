@@ -24,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.fiap.ecotrack.ui.theme.EcoTrackTheme
 import br.com.fiap.ecotrack.ui.theme.*
+import br.com.fiap.ecotrack.model.getAvailableTransportTypes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -152,7 +153,7 @@ fun CO2SummaryCard() {
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "12.5 kg",
+                text = "12.1 kg",
                 color = EcoGreen,
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold
@@ -170,7 +171,7 @@ fun CO2SummaryCard() {
             
             // Barra de progresso
             LinearProgressIndicator(
-            progress = { 0.6f },
+            progress = { 0.51f }, // 12.1 / 8.0 = 1.51, mas limitado a 1.0
             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(8.dp)
@@ -183,7 +184,7 @@ fun CO2SummaryCard() {
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
-                text = "Você está 4.5kg acima da meta",
+                text = "Você está 4.1kg acima da meta",
                 color = EcoWarning,
                 fontSize = 12.sp,
                 textAlign = TextAlign.Center
@@ -395,10 +396,11 @@ data class ImpactItem(
 )
 
 fun getImpactData(): List<ImpactItem> {
+    val transportTypes = getAvailableTransportTypes()
     return listOf(
         ImpactItem(
             action = "Transporte sustentável",
-            icon = Icons.Default.DirectionsCar,
+            icon = transportTypes[0].icon, // Carro
             color = EcoGreen,
             oneWeek = "~15 kg",
             oneMonth = "~60 kg",
@@ -406,7 +408,7 @@ fun getImpactData(): List<ImpactItem> {
         ),
         ImpactItem(
             action = "Caminhar/pedalar",
-            icon = Icons.AutoMirrored.Filled.DirectionsWalk,
+            icon = transportTypes[6].icon, // Bicicleta
             color = EcoGreenLight,
             oneWeek = "~2 kg",
             oneMonth = "~10 kg",
@@ -414,7 +416,7 @@ fun getImpactData(): List<ImpactItem> {
         ),
         ImpactItem(
             action = "Transporte público",
-            icon = Icons.Default.DirectionsBus,
+            icon = transportTypes[4].icon, // Ônibus
             color = EcoGreenAccent,
             oneWeek = "~20 kg",
             oneMonth = "~80 kg",
@@ -464,13 +466,14 @@ fun getImpactData(): List<ImpactItem> {
 }
 
 fun getActivityItems(): List<ActivityItem> {
+    val transportTypes = getAvailableTransportTypes()
     return listOf(
         ActivityItem(
             title = "Transporte",
-            subtitle = "Carro, ônibus, avião",
-            icon = Icons.Default.DirectionsCar,
-            color = EcoGreen,
-            co2Amount = "8.2 kg"
+            subtitle = "Carro, ônibus, trem, bicicleta",
+            icon = transportTypes[0].icon, // Carro como ícone principal
+            color = transportTypes[0].color,
+            co2Amount = "7.8 kg"
         ),
         ActivityItem(
             title = "Energia",

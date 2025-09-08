@@ -22,12 +22,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.fiap.ecotrack.ui.theme.*
+import br.com.fiap.ecotrack.model.getAvailableTransportTypes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransportScreen(
     onBackClick: () -> Unit = {},
-    onAddTransport: () -> Unit = {}
+    onAddTransport: () -> Unit = {},
+    onEmissionCalculator: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -54,6 +56,13 @@ fun TransportScreen(
                 }
             },
             actions = {
+                IconButton(onClick = onEmissionCalculator) {
+                    Icon(
+                        imageVector = Icons.Default.Calculate,
+                        contentDescription = "Calculadora de Emissões",
+                        tint = EcoGreen
+                    )
+                }
                 IconButton(onClick = onAddTransport) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Help,
@@ -122,7 +131,7 @@ fun TransportSummaryCard() {
                         fontSize = 14.sp
                     )
                     Text(
-                        text = "8.2 kg",
+                        text = "7.8 kg",
                         color = EcoGreen,
                         fontSize = 28.sp,
                         fontWeight = FontWeight.Bold
@@ -253,29 +262,30 @@ data class TransportItem(
 )
 
 fun getTransportItems(): List<TransportItem> {
+    val transportTypes = getAvailableTransportTypes()
     return listOf(
         TransportItem(
-            type = "Carro",
+            type = transportTypes[0].name, // Carro (Gasolina)
             details = "Casa → Trabalho",
-            icon = Icons.Default.DirectionsCar,
-            color = EcoGreen,
-            co2Amount = "6.2 kg",
+            icon = transportTypes[0].icon,
+            color = transportTypes[0].color,
+            co2Amount = "${String.format("%.2f", transportTypes[0].co2PerKm * 25)} kg", // 25 km * 0.192
             distance = "25 km"
         ),
         TransportItem(
-            type = "Ônibus",
+            type = transportTypes[4].name, // Ônibus
             details = "Trabalho → Shopping",
-            icon = Icons.Default.DirectionsBus,
-            color = EcoGreenLight,
-            co2Amount = "1.8 kg",
+            icon = transportTypes[4].icon,
+            color = transportTypes[4].color,
+            co2Amount = "${String.format("%.2f", transportTypes[4].co2PerKm * 15)} kg", // 15 km * 0.089
             distance = "15 km"
         ),
         TransportItem(
-            type = "Bicicleta",
+            type = transportTypes[6].name, // Bicicleta
             details = "Shopping → Casa",
-            icon = Icons.Default.PedalBike,
-            color = EcoGreenAccent,
-            co2Amount = "0.2 kg",
+            icon = transportTypes[6].icon,
+            color = transportTypes[6].color,
+            co2Amount = "${String.format("%.2f", transportTypes[6].co2PerKm * 5.2)} kg", // 5.2 km * 0.0
             distance = "5.2 km"
         )
     )

@@ -20,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.fiap.ecotrack.ui.theme.*
+import br.com.fiap.ecotrack.model.getAvailableTransportTypes
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +77,7 @@ fun AddTransportScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.weight(1f)
             ) {
-                items(getTransportTypes()) { transportType ->
+                items(getAvailableTransportTypes()) { transportType ->
                     TransportTypeCard(transportType = transportType)
                 }
             }
@@ -87,7 +88,7 @@ fun AddTransportScreen(
 
 @Composable
 fun TransportTypeCard(
-    transportType: TransportType
+    transportType: br.com.fiap.ecotrack.model.TransportType
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -117,7 +118,7 @@ fun TransportTypeCard(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "${transportType.co2PerKm} kg CO₂/km",
+                    text = "${String.format("%.3f", transportType.co2PerKm)} kg CO₂/km",
                     color = EcoTextSecondary,
                     fontSize = 12.sp
                 )
@@ -126,72 +127,6 @@ fun TransportTypeCard(
     }
 }
 
-// Data class
-data class TransportType(
-    val name: String,
-    val icon: ImageVector,
-    val color: Color,
-    val co2PerKm: Double // kg CO2 por km
-)
-
-fun getTransportTypes(): List<TransportType> {
-    return listOf(
-        TransportType(
-            name = "Carro (Gasolina)",
-            icon = Icons.Default.DirectionsCar,
-            color = EcoGreen,
-            co2PerKm = 0.192 // kg CO2 por km
-        ),
-        TransportType(
-            name = "Carro (Diesel)",
-            icon = Icons.Default.DirectionsCar,
-            color = EcoGreenLight,
-            co2PerKm = 0.171 // kg CO2 por km
-        ),
-        TransportType(
-            name = "Carro (Elétrico)",
-            icon = Icons.Default.ElectricCar,
-            color = EcoGreenAccent,
-            co2PerKm = 0.053 // kg CO2 por km
-        ),
-        TransportType(
-            name = "Ônibus",
-            icon = Icons.Default.DirectionsBus,
-            color = EcoGreen,
-            co2PerKm = 0.089 // kg CO2 por km
-        ),
-        TransportType(
-            name = "Metrô/Trem",
-            icon = Icons.Default.Train,
-            color = EcoGreenLight,
-            co2PerKm = 0.041 // kg CO2 por km
-        ),
-        TransportType(
-            name = "Bicicleta",
-            icon = Icons.Default.PedalBike,
-            color = EcoGreenAccent,
-            co2PerKm = 0.0 // kg CO2 por km (zero emissões)
-        ),
-        TransportType(
-            name = "Caminhada",
-            color = EcoGreen,
-            co2PerKm = 0.0, // kg CO2 por km (zero emissões)
-            icon = Icons.AutoMirrored.Filled.DirectionsWalk
-        ),
-        TransportType(
-            name = "Avião",
-            icon = Icons.Default.Flight,
-            color = EcoGreenLight,
-            co2PerKm = 0.285 // kg CO2 por km
-        ),
-        TransportType(
-            name = "Moto",
-            icon = Icons.Default.TwoWheeler,
-            color = EcoGreenAccent,
-            co2PerKm = 0.113 // kg CO2 por km
-        )
-    )
-}
 
 @Preview(showBackground = true)
 @Composable

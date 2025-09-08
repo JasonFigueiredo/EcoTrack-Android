@@ -9,6 +9,9 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import br.com.fiap.ecotrack.ui.screens.*
+import br.com.fiap.ecotrack.model.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
 
 @Composable
 fun EcoTrackNavigation(navController: NavHostController) {
@@ -67,6 +70,9 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 },
                 onAddTransport = {
                     navController.navigate("add_transport")
+                },
+                onEmissionCalculator = {
+                    navController.navigate("emission_calculator")
                 }
             )
         }
@@ -80,6 +86,40 @@ fun EcoTrackNavigation(navController: NavHostController) {
                     // Apenas navega de volta para a tela de transporte sem parâmetros
                     navController.navigate("transport") {
                         popUpTo("transport") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("emission_calculator") {
+            EmissionCalculatorScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onShowResults = { emissionComparison ->
+                    // Navegar para a tela de resultados com os dados
+                    navController.navigate("emission_results") {
+                        // Passar os dados via argumentos ou estado
+                    }
+                }
+            )
+        }
+
+        composable("emission_results") {
+            // Usar dados reais do estado global
+            val emissionComparison = br.com.fiap.ecotrack.model.EmissionState.currentEmissionComparison
+                ?: createMockEmissionComparison() // Fallback para dados mockados se não houver dados reais
+            
+            EmissionResultsScreen(
+                emissionComparison = emissionComparison,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onCalculateNew = {
+                    // Limpar estado anterior
+                    br.com.fiap.ecotrack.model.EmissionState.clearEmissionComparison()
+                    navController.navigate("emission_calculator") {
+                        popUpTo("emission_calculator") { inclusive = true }
                     }
                 }
             )
@@ -204,4 +244,51 @@ private fun openSocialLogin(context: Context, url: String) {
         fallbackIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         context.startActivity(fallbackIntent)
     }
+}
+
+private fun createMockEmissionComparison(): EmissionComparison {
+    return EmissionComparison(
+        selectedTransport = TransportEmissionResult(
+            transportType = TransportType(
+                id = "car_gasoline",
+                name = "Carro (Gasolina)",
+                icon = Icons.Default.DirectionsCar,
+                color = br.com.fiap.ecotrack.ui.theme.EcoGreen,
+                co2PerKm = 0.192,
+                climatiqActivityId = "passenger_vehicle-vehicle_type_car-fuel_source_gasoline",
+                description = "Veículo particular movido a gasolina"
+            ),
+            distance = 20.0,
+            co2Emissions = 3.84,
+            co2Unit = "kg",
+            emissionFactor = EmissionFactorResponse(
+                activity_id = "passenger_vehicle-vehicle_type_car-fuel_source_gasoline",
+                activity_name = "Carro (Gasolina)",
+                category = "Transport",
+                source = "Climatiq",
+                year = "2024",
+                region = "BR",
+                unit = "kg",
+                unit_type = "mass"
+            )
+        ),
+        alternatives = emptyList(),
+        savings = listOf(
+            EmissionSaving(
+                transportType = TransportType(
+                    id = "bicycle",
+                    name = "Bicicleta",
+                    icon = Icons.Default.PedalBike,
+                    color = br.com.fiap.ecotrack.ui.theme.EcoGreenAccent,
+                    co2PerKm = 0.0,
+                    climatiqActivityId = "passenger_vehicle-vehicle_type_bicycle",
+                    description = "Transporte sustentável e saudável"
+                ),
+                co2Saved = 3.84,
+                percentageSaved = 100.0,
+                benefits = listOf("Zero emissões", "Exercício físico", "Economia"),
+                drawbacks = listOf("Depende do clima", "Pode ser mais lento")
+            )
+        )
+    )
 }

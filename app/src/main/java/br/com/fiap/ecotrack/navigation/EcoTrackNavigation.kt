@@ -10,8 +10,10 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import br.com.fiap.ecotrack.ui.screens.*
 import br.com.fiap.ecotrack.model.*
+import br.com.fiap.ecotrack.model.DadosEnergia.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import br.com.fiap.ecotrack.ui.theme.*
 
 @Composable
 fun EcoTrackNavigation(navController: NavHostController) {
@@ -21,7 +23,7 @@ fun EcoTrackNavigation(navController: NavHostController) {
         navController = navController,
         startDestination = "intro"
     ) {
-        composable("Intro") {
+        composable("intro") {
             IntroScreen(
                 onContinue = {
                     navController.navigate("welcome")
@@ -132,6 +134,9 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 },
                 onAddEnergy = {
                     navController.navigate("add_energy")
+                },
+                onCalculadoraEnergia = {
+                    navController.navigate("calculadora_energia")
                 }
             )
         }
@@ -143,6 +148,35 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 }
             )
         }
+
+        composable("calculadora_energia") {
+            TelaCalculadoraEnergia(
+                onVoltarClick = {
+                    navController.popBackStack()
+                },
+                onMostrarResultados = { comparacaoEnergia ->
+                    navController.navigate("resultados_energia")
+                }
+            )
+        }
+
+        composable("resultados_energia") {
+            val comparacaoEnergia = br.com.fiap.ecotrack.model.EstadoEnergia.comparacaoAtual
+                ?: criarComparacaoEnergiaMock() // Fallback para dados mockados
+            
+            TelaResultadosEnergia(
+                comparacaoEnergia = comparacaoEnergia,
+                onVoltarClick = {
+                    navController.popBackStack()
+                },
+                onCalcularNovo = {
+                    br.com.fiap.ecotrack.model.EstadoEnergia.limparComparacaoEnergia()
+                    navController.navigate("calculadora_energia") {
+                        popUpTo("calculadora_energia") { inclusive = true }
+                    }
+                }
+            )
+        }
         
         composable("food") {
             FoodScreen(
@@ -151,6 +185,9 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 },
                 onAddFood = {
                     navController.navigate("add_food")
+                },
+                onFoodEmissionCalculator = {
+                    navController.navigate("food_emission_calculator")
                 }
             )
         }
@@ -164,6 +201,40 @@ fun EcoTrackNavigation(navController: NavHostController) {
                     // Apenas navega de volta para a tela de alimentação sem parâmetros
                     navController.navigate("food") {
                         popUpTo("food") { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable("food_emission_calculator") {
+            FoodEmissionCalculatorScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onShowResults = { foodEmissionComparison ->
+                    // Navegar para a tela de resultados com os dados
+                    navController.navigate("food_emission_results") {
+                        // Passar os dados via argumentos ou estado
+                    }
+                }
+            )
+        }
+
+        composable("food_emission_results") {
+            // Usar dados reais do estado global
+            val foodEmissionComparison = br.com.fiap.ecotrack.model.FoodEmissionState.getFoodEmissionComparison()
+                ?: createMockFoodEmissionComparison() // Fallback para dados mockados se não houver dados reais
+            
+            FoodEmissionResultsScreen(
+                foodEmissionComparison = foodEmissionComparison,
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onCalculateNew = {
+                    // Limpar estado anterior
+                    br.com.fiap.ecotrack.model.FoodEmissionState.clearFoodEmissionComparison()
+                    navController.navigate("food_emission_calculator") {
+                        popUpTo("food_emission_calculator") { inclusive = true }
                     }
                 }
             )
@@ -186,9 +257,10 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 onOpenSobre = {
                     navController.navigate("add_sobre")
                 },
-            ) {
-                navController.navigate("add_historico")
-            }
+                onOpenHistorico = {
+                    navController.navigate("add_historico")
+                }
+            )
         }
 
         composable("add_meta") {
@@ -288,6 +360,117 @@ private fun createMockEmissionComparison(): EmissionComparison {
                 percentageSaved = 100.0,
                 benefits = listOf("Zero emissões", "Exercício físico", "Economia"),
                 drawbacks = listOf("Depende do clima", "Pode ser mais lento")
+            )
+        )
+    )
+}
+
+private fun criarComparacaoEnergiaMock(): ComparacaoEmissaoEnergia {
+    val tipoEnergiaMock = TipoEnergia(
+        id = "ar_condicionado",
+        nome = "Ar Condicionado",
+        icone = Icons.Default.AcUnit,
+        cor = br.com.fiap.ecotrack.ui.theme.EcoGreen,
+        co2PorKwh = 0.118,
+        climatiqActivityId = "electricity-energy_source_grid-electricity_type_na-country_BR",
+        descricao = "Sistema de climatização residencial",
+        potenciaMedia = 2000.0
+    )
+    
+    return ComparacaoEmissaoEnergia(
+        energiaSelecionada = ResultadoEmissaoEnergia(
+            tipoEnergia = tipoEnergiaMock,
+            consumoKwh = 4.8,
+            horasUso = 2.0,
+            periodo = PeriodoTempo.DIA,
+            co2Emissoes = 0.566,
+            co2Unidade = "kg",
+            fatorEmissao = FatorEmissaoEnergiaResposta(
+                activity_id = "electricity-energy_source_grid-electricity_type_na-country_BR",
+                activity_name = "Ar Condicionado",
+                category = "electricity",
+                source = "mock_data",
+                year = "2024",
+                region = "BR",
+                unit = "kWh",
+                unit_type = "energy"
+            )
+        ),
+        alternativas = emptyList(),
+        economias = listOf(
+            EconomiaEnergia(
+                tipoEnergia = TipoEnergia(
+                    id = "energia_solar",
+                    nome = "Energia Solar",
+                    icone = Icons.Default.WbSunny,
+                    cor = br.com.fiap.ecotrack.ui.theme.EcoGreenAccent,
+                    co2PorKwh = 0.0,
+                    climatiqActivityId = "electricity-energy_source_solar-electricity_type_na-country_BR",
+                    descricao = "Energia solar fotovoltaica",
+                    potenciaMedia = 0.0
+                ),
+                co2Economizado = 0.566,
+                percentualEconomizado = 100.0,
+                beneficios = listOf("Zero emissões", "Energia renovável", "Economia na conta"),
+                desvantagens = listOf("Custo inicial alto", "Depende do sol")
+            )
+        )
+    )
+}
+
+private fun createMockFoodEmissionComparison(): FoodEmissionComparison {
+    return FoodEmissionComparison(
+        selectedFood = FoodEmissionResult(
+            foodType = br.com.fiap.ecotrack.model.FoodType(
+                id = "grapes",
+                name = "Uvas",
+                icon = Icons.Default.Circle,
+                color = EcoGreenAccent,
+                co2PerKg = 0.5,
+                caloriesPerKg = 620.0,
+                proteinPerKg = 6.0,
+                carbsPerKg = 160.0,
+                fatPerKg = 1.0,
+                climatiqActivityId = "food-grapes",
+                description = "Uvas - fruta versátil e nutritiva",
+                category = br.com.fiap.ecotrack.model.FoodCategory.FRUITS
+            ),
+            weight = 0.5,
+            period = br.com.fiap.ecotrack.model.ConsumptionPeriod.DAILY,
+            co2Emissions = 0.25,
+            co2Unit = "kg",
+            emissionFactor = br.com.fiap.ecotrack.model.EmissionFactorResponse(
+                activity_id = "food-grapes",
+                activity_name = "Uvas",
+                category = "Food",
+                source = "Local",
+                year = "2024",
+                region = "BR",
+                unit = "kg",
+                unit_type = "mass"
+            )
+        ),
+        alternatives = emptyList(),
+        savings = listOf(
+            br.com.fiap.ecotrack.model.FoodEmissionSaving(
+                foodType = br.com.fiap.ecotrack.model.FoodType(
+                    id = "oranges",
+                    name = "Laranjas",
+                    icon = Icons.Default.Circle,
+                    color = EcoGreenAccent,
+                    co2PerKg = 0.3,
+                    caloriesPerKg = 470.0,
+                    proteinPerKg = 9.0,
+                    carbsPerKg = 118.0,
+                    fatPerKg = 1.0,
+                    climatiqActivityId = "food-oranges",
+                    description = "Laranjas - fruta cítrica rica em vitamina C",
+                    category = br.com.fiap.ecotrack.model.FoodCategory.FRUITS
+                ),
+                co2Saved = 0.1,
+                percentageSaved = 40.0,
+                benefits = listOf("Baixo impacto ambiental", "Rica em vitamina C", "Antioxidantes", "Refrescante"),
+                drawbacks = listOf("Pode ser mais caro", "Estacionalidade", "Pode ser ácida")
             )
         )
     )

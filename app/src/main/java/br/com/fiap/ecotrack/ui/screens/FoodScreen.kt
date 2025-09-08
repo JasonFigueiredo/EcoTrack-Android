@@ -25,7 +25,8 @@ import br.com.fiap.ecotrack.ui.theme.*
 @Composable
 fun FoodScreen(
     onBackClick: () -> Unit = {},
-    onAddFood: () -> Unit = {}
+    onAddFood: () -> Unit = {},
+    onFoodEmissionCalculator: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -51,6 +52,13 @@ fun FoodScreen(
                 }
             },
             actions = {
+                IconButton(onClick = onFoodEmissionCalculator) {
+                    Icon(
+                        imageVector = Icons.Default.Calculate,
+                        contentDescription = "Calculadora de Emissões",
+                        tint = EcoGreen
+                    )
+                }
                 IconButton(onClick = onAddFood) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Help,

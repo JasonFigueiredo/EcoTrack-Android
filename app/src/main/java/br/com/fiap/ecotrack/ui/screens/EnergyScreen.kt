@@ -27,7 +27,8 @@ import br.com.fiap.ecotrack.ui.theme.*
 @Composable
 fun EnergyScreen(
     onBackClick: () -> Unit = {},
-    onAddEnergy: () -> Unit = {}
+    onAddEnergy: () -> Unit = {},
+    onCalculadoraEnergia: () -> Unit = {}
 ) {
     Column(
         modifier = Modifier
@@ -54,6 +55,13 @@ fun EnergyScreen(
                 }
             },
             actions = {
+                IconButton(onClick = onCalculadoraEnergia) {
+                    Icon(
+                        imageVector = Icons.Default.Calculate,
+                        contentDescription = "Calculadora de Energia",
+                        tint = EcoGreen
+                    )
+                }
                 IconButton(onClick = onAddEnergy) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.Help,

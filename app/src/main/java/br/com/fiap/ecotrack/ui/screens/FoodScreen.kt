@@ -147,12 +147,12 @@ fun FoodScreen(
             
             // Lista de alimentos com dados detalhados
             item {
-                Text(
+            Text(
                     text = "Alimentos e Refeições",
-                    color = EcoTextPrimary,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                color = EcoTextPrimary,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
             }
             
             items(getFoodItems(periodoSelecionado, tipoAlimentoSelecionado, tipoRefeicaoSelecionado)) { food ->

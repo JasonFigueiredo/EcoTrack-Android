@@ -259,6 +259,9 @@ fun EcoTrackNavigation(navController: NavHostController) {
                 },
                 onOpenHistorico = {
                     navController.navigate("add_historico")
+                },
+                onOpenConfiguracoes = {
+                    navController.navigate("settings")
                 }
             )
         }
@@ -299,6 +302,42 @@ fun EcoTrackNavigation(navController: NavHostController) {
             AddHistoricoScreen(
                 onBackClick = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        composable("settings") {
+            SettingsScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onNotifications = {
+                    // Navegar para configurações de notificações
+                    navController.navigate("notification_settings")
+                },
+                onPrivacy = {
+                    // Abrir política de privacidade
+                    openSocialLogin(context, "https://ecotrack.com/privacy")
+                },
+                onDataManagement = {
+                    // Navegar para gerenciamento de dados
+                    navController.navigate("manage_data")
+                },
+                onLanguage = {
+                    // Navegar para configurações de idioma
+                    navController.navigate("language_settings")
+                },
+                onTheme = {
+                    // Navegar para configurações de tema
+                    navController.navigate("theme_settings")
+                },
+                onExportData = {
+                    // Exportar dados do usuário
+                    navController.navigate("export_data")
+                },
+                onDeleteAccount = {
+                    // Navegar para confirmação de exclusão de conta
+                    navController.navigate("delete_account")
                 }
             )
         }

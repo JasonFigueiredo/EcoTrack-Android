@@ -1,9 +1,11 @@
 package br.com.fiap.ecotrack.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -16,30 +18,41 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import br.com.fiap.ecotrack.ui.theme.*
+import br.com.fiap.ecotrack.ui.theme.LocalDynamicColors
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddMetaScreen(
     onBackClick: () -> Unit = {}
 ) {
+    val colors = LocalDynamicColors.current
     var selectedMeta by remember { mutableStateOf<MetaItem?>(null) }
+    var selectedCategory by remember { mutableStateOf("Todas") }
+    var isLoading by remember { mutableStateOf(true) }
     
-    Column(
+    // Simular carregamento de dados da API
+    LaunchedEffect(Unit) {
+        delay(1000) // Simular delay da API
+        isLoading = false
+    }
+    
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(EcoDark)
-            .padding(bottom = 30.dp)
+            .background(colors.background)
     ) {
         TopAppBar(
             title = {
                 Text(
-                    text = "Metas para Redução de CO₂",
-                    color = EcoTextPrimary,
+                    text = "Metas Sustentáveis",
+                    color = colors.textPrimary,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -49,32 +62,50 @@ fun AddMetaScreen(
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Voltar",
-                        tint = EcoTextPrimary
+                        tint = colors.textPrimary
                     )
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = EcoDark
+                containerColor = colors.background
             )
         )
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            Text(
-                text = "Aqui estão algumas ações que você pode adotar no seu dia a dia para ajudar na redução das emissões de carbono e contribuir para um futuro mais sustentável.",
-                color = EcoTextSecondary,
-                fontSize = 14.sp
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            LazyColumn(
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
             ) {
-                items(getMetaItems()) { meta ->
+                CircularProgressIndicator(
+                    color = colors.green,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+        } else {
+            LazyColumn(
+                state = rememberLazyListState(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 100.dp)
+                    .padding(bottom = 45.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Resumo de Metas
+                item {
+                    GoalsSummaryCard()
+                }
+                
+                // Filtros por Categoria
+                item {
+                    MetaCategoryFilterSection(
+                        selectedCategory = selectedCategory,
+                        onCategorySelected = { selectedCategory = it }
+                    )
+                }
+                
+                // Lista de Metas Filtrada
+                items(getFilteredMetaItems(selectedCategory)) { meta ->
                     MetaCard(
                         meta = meta,
                         onClick = { selectedMeta = meta }
@@ -94,14 +125,268 @@ fun AddMetaScreen(
 }
 
 @Composable
+fun GoalsSummaryCard() {
+    val colors = LocalDynamicColors.current
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.green.copy(alpha = 0.1f)
+        ),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Flag,
+                    contentDescription = "Metas",
+                    tint = colors.green,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Suas Metas Sustentáveis",
+                    color = colors.green,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Primeira linha de estatísticas
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                MetaSummaryStat(
+                    value = "24",
+                    label = "Metas Disponíveis",
+                    color = colors.green,
+                    icon = Icons.Default.List
+                )
+                MetaSummaryStat(
+                    value = "8",
+                    label = "Em Progresso",
+                    color = colors.greenLight,
+                    icon = Icons.Default.TrendingUp
+                )
+                MetaSummaryStat(
+                    value = "12",
+                    label = "Concluídas",
+                    color = colors.greenAccent,
+                    icon = Icons.Default.CheckCircle
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            // Segunda linha de estatísticas
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                MetaSummaryStat(
+                    value = "1.8",
+                    label = "Ton CO₂ Economizado",
+                    color = colors.green,
+                    icon = Icons.Default.Eco
+                )
+                MetaSummaryStat(
+                    value = "67%",
+                    label = "Taxa de Sucesso",
+                    color = colors.success,
+                    icon = Icons.Default.EmojiEvents
+                )
+                MetaSummaryStat(
+                    value = "45",
+                    label = "Dias de Meta",
+                    color = colors.warning,
+                    icon = Icons.Default.CalendarToday
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Barra de progresso das metas
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Progresso das Metas",
+                        color = colors.textPrimary,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    Text(
+                        text = "67%",
+                        color = colors.green,
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                Spacer(modifier = Modifier.height(8.dp))
+                LinearProgressIndicator(
+                    progress = 0.67f,
+                    modifier = Modifier.fillMaxWidth(),
+                    color = colors.green,
+                    trackColor = colors.surfaceVariant
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun MetaSummaryStat(
+    value: String,
+    label: String,
+    color: Color,
+    icon: ImageVector
+) {
+    val colors = LocalDynamicColors.current
+    
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = color,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = value,
+            color = color,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = label,
+            color = colors.textSecondary,
+            fontSize = 10.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun MetaCategoryFilterSection(
+    selectedCategory: String,
+    onCategorySelected: (String) -> Unit
+) {
+    val colors = LocalDynamicColors.current
+    val categories = listOf(
+        "Todas" to colors.green,
+        "Transporte" to colors.greenLight,
+        "Energia" to colors.greenAccent,
+        "Alimentação" to colors.green,
+        "Resíduos" to colors.greenLight,
+        "Água" to colors.greenAccent,
+        "Consumo" to colors.green,
+        "Especiais" to colors.greenLight
+    )
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.surface
+        ),
+        shape = RoundedCornerShape(12.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(16.dp)
+        ) {
+            Text(
+                text = "Filtrar por Categoria",
+                color = colors.textPrimary,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+            
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            // Primeira linha de filtros
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                categories.take(4).forEach { (category, color) ->
+                    MetaCategoryChip(
+                        text = category,
+                        color = color,
+                        isSelected = selectedCategory == category,
+                        onClick = { onCategorySelected(category) }
+                    )
+                }
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            // Segunda linha de filtros
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                categories.drop(4).forEach { (category, color) ->
+                    MetaCategoryChip(
+                        text = category,
+                        color = color,
+                        isSelected = selectedCategory == category,
+                        onClick = { onCategorySelected(category) }
+                    )
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun MetaCategoryChip(
+    text: String,
+    color: Color,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    val colors = LocalDynamicColors.current
+    
+    Card(
+        modifier = Modifier
+            .padding(2.dp)
+            .clickable { onClick() },
+        colors = CardDefaults.cardColors(
+            containerColor = if (isSelected) color else colors.surface
+        ),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Text(
+            text = text,
+            color = if (isSelected) Color.White else colors.textSecondary,
+            fontSize = 10.sp,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+        )
+    }
+}
+
+@Composable
 fun MetaCard(
     meta: MetaItem,
     onClick: () -> Unit
 ) {
+    val colors = LocalDynamicColors.current
+    
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = EcoDarkSurface
+            containerColor = colors.surface
         ),
         shape = RoundedCornerShape(12.dp),
         onClick = onClick
@@ -110,37 +395,86 @@ fun MetaCard(
             modifier = Modifier.padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = meta.icon,
-                contentDescription = meta.title,
-                tint = meta.color,
-                modifier = Modifier.size(28.dp)
-            )
+            // Ícone com fundo colorido
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(
+                        color = meta.color.copy(alpha = 0.2f),
+                        shape = RoundedCornerShape(8.dp)
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = meta.icon,
+                    contentDescription = meta.title,
+                    tint = meta.color,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
 
             Spacer(modifier = Modifier.width(16.dp))
 
             Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = meta.title,
-                    color = EcoTextPrimary,
+                    color = colors.textPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
                 if (meta.subtitle.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = meta.subtitle,
-                        color = EcoTextSecondary,
-                        fontSize = 12.sp
+                        color = colors.textSecondary,
+                        fontSize = 12.sp,
+                        lineHeight = 16.sp
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                // Indicador de categoria
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Category,
+                        contentDescription = "Categoria",
+                        tint = meta.color,
+                        modifier = Modifier.size(12.dp)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    Text(
+                        text = meta.category,
+                        color = meta.color,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
             
-            Icon(
-                imageVector = Icons.Default.Info,
-                contentDescription = "Ver detalhes",
-                tint = EcoTextSecondary,
-                modifier = Modifier.size(20.dp)
-            )
+            // Status da meta
+            Column(
+                horizontalAlignment = Alignment.End
+            ) {
+                Icon(
+                    imageVector = if (meta.isCompleted) Icons.Default.CheckCircle else Icons.Default.Info,
+                    contentDescription = if (meta.isCompleted) "Concluída" else "Ver detalhes",
+                    tint = if (meta.isCompleted) colors.success else colors.textSecondary,
+                    modifier = Modifier.size(20.dp)
+                )
+                
+                if (meta.isCompleted) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Concluída",
+                        color = colors.success,
+                        fontSize = 8.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
     }
 }
@@ -150,13 +484,15 @@ fun MetaDetailDialog(
     meta: MetaItem,
     onDismiss: () -> Unit
 ) {
+    val colors = LocalDynamicColors.current
+    
     Dialog(onDismissRequest = onDismiss) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = EcoDarkSurface
+                containerColor = colors.surface
             ),
             shape = RoundedCornerShape(16.dp)
         ) {
@@ -172,29 +508,46 @@ fun MetaDetailDialog(
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Icon(
-                            imageVector = meta.icon,
-                            contentDescription = meta.title,
-                            tint = meta.color,
-                            modifier = Modifier.size(32.dp)
-                        )
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(
+                                    color = meta.color.copy(alpha = 0.2f),
+                                    shape = RoundedCornerShape(8.dp)
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                imageVector = meta.icon,
+                                contentDescription = meta.title,
+                                tint = meta.color,
+                                modifier = Modifier.size(24.dp)
+                            )
+                        }
                         
                         Spacer(modifier = Modifier.width(12.dp))
                         
-                        Text(
-                            text = meta.title,
-                            color = EcoTextPrimary,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            modifier = Modifier.weight(1f)
-                        )
+                        Column {
+                            Text(
+                                text = meta.title,
+                                color = colors.textPrimary,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                text = meta.category,
+                                color = meta.color,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                        }
                     }
                     
                     IconButton(onClick = onDismiss) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Fechar",
-                            tint = EcoTextSecondary
+                            tint = colors.textSecondary
                         )
                     }
                 }
@@ -204,10 +557,36 @@ fun MetaDetailDialog(
                 // Conteúdo detalhado da meta
                 Text(
                     text = getMetaDetails(meta.title),
-                    color = EcoTextSecondary,
+                    color = colors.textSecondary,
                     fontSize = 14.sp,
                     lineHeight = 20.sp
                 )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Botão de ação
+                Button(
+                    onClick = { 
+                        // TODO: Implementar ação de aceitar meta
+                        onDismiss() 
+                    },
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = meta.color
+                    ),
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = "Aceitar Meta",
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = if (meta.isCompleted) "Meta Concluída" else "Aceitar Meta",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
             }
         }
     }
@@ -216,131 +595,203 @@ fun MetaDetailDialog(
 data class MetaItem(
     val title: String,
     val subtitle: String,
+    val category: String,
     val icon: ImageVector,
-    val color: Color
+    val color: Color,
+    val isCompleted: Boolean = false
 )
+
+// Função de filtro
+fun getFilteredMetaItems(selectedCategory: String): List<MetaItem> {
+    val allItems = getMetaItems()
+    return if (selectedCategory == "Todas") {
+        allItems
+    } else {
+        allItems.filter { it.category == selectedCategory }
+    }
+}
 
 fun getMetaItems(): List<MetaItem> {
     return listOf(
+        // TRANSPORTE
         MetaItem(
             title = "Reduzir o uso de transporte a combustão",
             subtitle = "Evitar o uso excessivo de carros e motos movidos a gasolina ou diesel.",
+            category = "Transporte",
             icon = Icons.Default.DirectionsCar,
-            color = EcoGreen
+            color = EcoGreen,
+            isCompleted = true
         ),
         MetaItem(
             title = "Optar por andar a pé ou de bicicleta",
             subtitle = "Priorizar deslocamentos curtos sem uso de veículos motorizados.",
+            category = "Transporte",
             color = EcoGreenLight,
-            icon = Icons.AutoMirrored.Filled.DirectionsWalk
+            icon = Icons.AutoMirrored.Filled.DirectionsWalk,
+            isCompleted = true
         ),
         MetaItem(
             title = "Utilizar transporte público sempre que possível",
             subtitle = "Substituir o carro individual por ônibus, metrô ou trem.",
+            category = "Transporte",
             icon = Icons.Default.DirectionsBus,
             color = EcoGreenAccent
         ),
         MetaItem(
-            title = "Reduzir o consumo de carne vermelha",
-            subtitle = "Diminuir a frequência de consumo de carnes, especialmente bovina.",
-            icon = Icons.Default.Restaurant,
+            title = "Usar transporte compartilhado",
+            subtitle = "Participar de caronas, usar aplicativos de compartilhamento de veículos.",
+            category = "Transporte",
+            icon = Icons.Default.Group,
             color = EcoGreen
         ),
+        
+        // ENERGIA
         MetaItem(
             title = "Economizar energia elétrica",
             subtitle = "Desligar luzes e eletrônicos quando não estiverem em uso. Utilizar lâmpadas LED e aparelhos eficientes.",
+            category = "Energia",
             icon = Icons.Default.EnergySavingsLeaf,
-            color = EcoGreenLight
-        ),
-        MetaItem(
-            title = "Separar e reciclar o lixo corretamente",
-            subtitle = "Adotar práticas de coleta seletiva em casa e no trabalho.",
-            icon = Icons.Default.Recycling,
-            color = EcoGreenAccent
-        ),
-        MetaItem(
-            title = "Plantar árvores e apoiar projetos ambientais",
-            subtitle = "Participar de iniciativas de reflorestamento ou doar para causas ambientais.",
-            icon = Icons.Default.Forest,
-            color = EcoGreen
-        ),
-        MetaItem(
-            title = "Consumir de forma consciente",
-            subtitle = "Comprar apenas o necessário. Priorizar produtos duráveis, recicláveis ou reutilizáveis.",
-            icon = Icons.Default.ShoppingCart,
-            color = EcoGreenLight
-        ),
-        MetaItem(
-            title = "Reduzir o uso de plásticos descartáveis",
-            subtitle = "Substituir sacolas, garrafas e embalagens plásticas por alternativas reutilizáveis.",
-            icon = Icons.Default.DeleteOutline,
-            color = EcoGreenAccent
+            color = EcoGreenLight,
+            isCompleted = true
         ),
         MetaItem(
             title = "Utilizar energia solar quando possível",
             subtitle = "Instalar painéis solares ou usar energia solar térmica para aquecimento.",
+            category = "Energia",
             icon = Icons.Default.WbSunny,
-            color = EcoGreen
-        ),
-        MetaItem(
-            title = "Reduzir o desperdício de alimentos",
-            subtitle = "Planejar refeições, armazenar corretamente e aproveitar sobras.",
-            icon = Icons.Default.RestaurantMenu,
-            color = EcoGreenLight
-        ),
-        MetaItem(
-            title = "Usar produtos de limpeza ecológicos",
-            subtitle = "Substituir produtos químicos por alternativas naturais e biodegradáveis.",
-            icon = Icons.Default.CleaningServices,
-            color = EcoGreenAccent
-        ),
-        MetaItem(
-            title = "Reduzir o uso de papel",
-            subtitle = "Digitalizar documentos, usar frente e verso e reciclar papel usado.",
-            icon = Icons.Default.Description,
-            color = EcoGreen
-        ),
-        MetaItem(
-            title = "Comprar produtos locais e sazonais",
-            subtitle = "Reduzir distância de transporte e apoiar produtores locais.",
-            icon = Icons.Default.LocalGroceryStore,
-            color = EcoGreenLight
-        ),
-        MetaItem(
-            title = "Usar roupas sustentáveis",
-            subtitle = "Escolher tecidos orgânicos, reciclar roupas e evitar fast fashion.",
-            icon = Icons.Default.Checkroom,
             color = EcoGreenAccent
         ),
         MetaItem(
             title = "Reduzir o uso de ar condicionado",
             subtitle = "Usar ventiladores, sombrear janelas e ajustar temperatura conscientemente.",
+            category = "Energia",
             icon = Icons.Default.AcUnit,
+            color = EcoGreen
+        ),
+        
+        // ALIMENTAÇÃO
+        MetaItem(
+            title = "Reduzir o consumo de carne vermelha",
+            subtitle = "Diminuir a frequência de consumo de carnes, especialmente bovina.",
+            category = "Alimentação",
+            icon = Icons.Default.Restaurant,
+            color = EcoGreen,
+            isCompleted = true
+        ),
+        MetaItem(
+            title = "Reduzir o desperdício de alimentos",
+            subtitle = "Planejar refeições, armazenar corretamente e aproveitar sobras.",
+            category = "Alimentação",
+            icon = Icons.Default.RestaurantMenu,
+            color = EcoGreenLight
+        ),
+        MetaItem(
+            title = "Comprar produtos locais e sazonais",
+            subtitle = "Reduzir distância de transporte e apoiar produtores locais.",
+            category = "Alimentação",
+            icon = Icons.Default.LocalGroceryStore,
+            color = EcoGreenAccent
+        ),
+        
+        // RESÍDUOS
+        MetaItem(
+            title = "Separar e reciclar o lixo corretamente",
+            subtitle = "Adotar práticas de coleta seletiva em casa e no trabalho.",
+            category = "Resíduos",
+            icon = Icons.Default.Recycling,
+            color = EcoGreenAccent,
+            isCompleted = true
+        ),
+        MetaItem(
+            title = "Reduzir o uso de plásticos descartáveis",
+            subtitle = "Substituir sacolas, garrafas e embalagens plásticas por alternativas reutilizáveis.",
+            category = "Resíduos",
+            icon = Icons.Default.DeleteOutline,
             color = EcoGreen
         ),
         MetaItem(
             title = "Compostar resíduos orgânicos",
             subtitle = "Transformar restos de comida e jardim em adubo natural.",
+            category = "Resíduos",
             icon = Icons.Default.Grass,
             color = EcoGreenLight
         ),
         MetaItem(
-            title = "Usar transporte compartilhado",
-            subtitle = "Participar de caronas, usar aplicativos de compartilhamento de veículos.",
-            icon = Icons.Default.Group,
+            title = "Reduzir o uso de papel",
+            subtitle = "Digitalizar documentos, usar frente e verso e reciclar papel usado.",
+            category = "Resíduos",
+            icon = Icons.Default.Description,
             color = EcoGreenAccent
         ),
+        
+        // ÁGUA
         MetaItem(
             title = "Reduzir o uso de água",
             subtitle = "Consertar vazamentos, usar dispositivos economizadores e reutilizar água.",
+            category = "Água",
             icon = Icons.Default.WaterDrop,
             color = EcoGreen
+        ),
+        
+        // CONSUMO
+        MetaItem(
+            title = "Consumir de forma consciente",
+            subtitle = "Comprar apenas o necessário. Priorizar produtos duráveis, recicláveis ou reutilizáveis.",
+            category = "Consumo",
+            icon = Icons.Default.ShoppingCart,
+            color = EcoGreenLight,
+            isCompleted = true
+        ),
+        MetaItem(
+            title = "Usar roupas sustentáveis",
+            subtitle = "Escolher tecidos orgânicos, reciclar roupas e evitar fast fashion.",
+            category = "Consumo",
+            icon = Icons.Default.Checkroom,
+            color = EcoGreenAccent
         ),
         MetaItem(
             title = "Apoiar empresas sustentáveis",
             subtitle = "Escolher empresas com práticas ambientais responsáveis.",
+            category = "Consumo",
             icon = Icons.Default.Business,
+            color = EcoGreen
+        ),
+        
+        // ESPECIAIS
+        MetaItem(
+            title = "Plantar árvores e apoiar projetos ambientais",
+            subtitle = "Participar de iniciativas de reflorestamento ou doar para causas ambientais.",
+            category = "Especiais",
+            icon = Icons.Default.Forest,
             color = EcoGreenLight
+        ),
+        MetaItem(
+            title = "Usar produtos de limpeza ecológicos",
+            subtitle = "Substituir produtos químicos por alternativas naturais e biodegradáveis.",
+            category = "Especiais",
+            icon = Icons.Default.CleaningServices,
+            color = EcoGreenAccent
+        ),
+        MetaItem(
+            title = "Desafio 30 Dias Sustentáveis",
+            subtitle = "Completar 30 dias consecutivos de práticas sustentáveis.",
+            category = "Especiais",
+            icon = Icons.Default.EmojiEvents,
+            color = EcoGreen
+        ),
+        MetaItem(
+            title = "Herói do Clima",
+            subtitle = "Manter práticas sustentáveis por 6 meses consecutivos.",
+            category = "Especiais",
+            icon = Icons.Default.MilitaryTech,
+            color = EcoGreenLight
+        ),
+        MetaItem(
+            title = "Influenciador Verde",
+            subtitle = "Compartilhar 100 dicas sustentáveis nas redes sociais.",
+            category = "Especiais",
+            icon = Icons.Default.Share,
+            color = EcoGreenAccent
         )
     )
 }

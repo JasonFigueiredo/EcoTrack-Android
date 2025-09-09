@@ -180,7 +180,7 @@ fun PeriodoFiltroCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             PeriodoFiltro.values().forEach { periodo ->
                 FilterChip(
@@ -192,14 +192,20 @@ fun PeriodoFiltroCard(
                                 PeriodoFiltro.MES -> "Mês"
                                 PeriodoFiltro.ANO -> "Ano"
                             },
-                            color = if (periodoSelecionado == periodo) EcoTextOnGreen else EcoTextPrimary
+                            color = if (periodoSelecionado == periodo) EcoTextOnGreen else EcoTextPrimary,
+                            fontSize = 12.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .wrapContentHeight(Alignment.CenterVertically)
                         )
                     },
                     selected = periodoSelecionado == periodo,
                     colors = FilterChipDefaults.filterChipColors(
                         selectedContainerColor = EcoGreen,
                         containerColor = EcoDarkSurface
-                    )
+                    ),
+                    modifier = Modifier.weight(1f)
                 )
             }
         }
@@ -234,7 +240,6 @@ fun EstadoTipoFiltroCard(
             Spacer(modifier = Modifier.height(8.dp))
             
             Column(
-                modifier = Modifier.height(120.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 // Primeira linha de estados
@@ -249,7 +254,11 @@ fun EstadoTipoFiltroCard(
                                 Text(
                                     text = estado.name,
                                     color = if (estadoSelecionado == estado) EcoTextOnGreen else EcoTextPrimary,
-                                    fontSize = 10.sp
+                                    fontSize = 12.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight(Alignment.CenterVertically)
                                 )
                             },
                             selected = estadoSelecionado == estado,
@@ -274,7 +283,11 @@ fun EstadoTipoFiltroCard(
                                 Text(
                                     text = estado.name,
                                     color = if (estadoSelecionado == estado) EcoTextOnGreen else EcoTextPrimary,
-                                    fontSize = 10.sp
+                                    fontSize = 12.sp,
+                                    textAlign = TextAlign.Center,
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .wrapContentHeight(Alignment.CenterVertically)
                                 )
                             },
                             selected = estadoSelecionado == estado,
@@ -315,7 +328,11 @@ fun EstadoTipoFiltroCard(
                                     TipoConsumidorFiltro.INDUSTRIAL -> "Industrial"
                                 },
                                 color = if (tipoConsumidorSelecionado == tipo) EcoTextOnGreen else EcoTextPrimary,
-                                fontSize = 12.sp
+                                fontSize = 12.sp,
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentHeight(Alignment.CenterVertically)
                             )
                         },
                         selected = tipoConsumidorSelecionado == tipo,

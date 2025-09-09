@@ -23,6 +23,13 @@ val EcoError = Color(0xFFCF6679)
 val EcoSuccess = Color(0xFF4CAF50)
 val EcoWarning = Color(0xFFFF9800)
 
+// Cores para tema claro
+val EcoLight = Color(0xFFFFFBFE)
+val EcoLightSurface = Color(0xFFFFFFFF)
+val EcoLightSurfaceVariant = Color(0xFFE7E0EC)
+val EcoTextPrimaryLight = Color(0xFF1C1B1F)
+val EcoTextSecondaryLight = Color(0xFF49454F)
+
 // Cores antigas (mantidas para compatibilidade)
 val Purple80 = Color(0xFFD0BCFF)
 val PurpleGrey80 = Color(0xFFCCC2DC)

@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.painterResource
@@ -23,6 +24,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import br.com.fiap.ecotrack.R
 import br.com.fiap.ecotrack.ui.theme.*
+import br.com.fiap.ecotrack.ui.theme.LocalDynamicColors
 import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -30,14 +32,15 @@ import kotlinx.coroutines.delay
 fun IntroScreen(
     onContinue: () -> Unit = {}
 ) {
-    val pagerState = rememberPagerState(pageCount = { 5 })
+    val colors = LocalDynamicColors.current
+    val pagerState = rememberPagerState(pageCount = { 6 })
     var currentPage by remember { mutableIntStateOf(0) }
     
     // Auto-scroll effect
     LaunchedEffect(pagerState) {
         while (true) {
-            delay(4000) // 4 seconds per banner
-            val nextPage = (currentPage + 1) % 5
+            delay(5000) // 5 seconds per banner
+            val nextPage = (currentPage + 1) % 6
             pagerState.animateScrollToPage(nextPage)
             currentPage = nextPage
         }
@@ -51,18 +54,18 @@ fun IntroScreen(
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(EcoDark)
+            .background(colors.background)
     ) {
         // Background pattern
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .background(
-                    brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                    brush = Brush.verticalGradient(
                         colors = listOf(
-                            EcoDark,
-                            EcoDarkSurface,
-                            EcoDark
+                            colors.background,
+                            colors.surface,
+                            colors.background
                         )
                     )
                 )
@@ -91,27 +94,27 @@ fun IntroScreen(
             // Title
             Text(
                 text = "EcoTrack",
-                color = EcoTextPrimary,
-                fontSize = 32.sp,
+                color = colors.green,
+                fontSize = 36.sp,
                 fontWeight = FontWeight.Bold
             )
             
             Text(
-                text = "Tecnologia ESG para um Futuro Sustentável",
-                color = EcoTextSecondary,
+                text = "Transforme Pequenas Ações em Grandes Impactos",
+                color = colors.textSecondary,
                 fontSize = 16.sp,
                 textAlign = TextAlign.Center,
                 lineHeight = 22.sp
             )
             
-            Spacer(modifier = Modifier.height(20.dp))
+            Spacer(modifier = Modifier.height(10.dp))
             
             // Banner Pager
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(400.dp)
+                    .height(450.dp)
             ) { page ->
                 BannerCard(
                     banner = getBannerData()[page],
@@ -119,41 +122,42 @@ fun IntroScreen(
                 )
             }
             
-            Spacer(modifier = Modifier.height(10.dp))
+            Spacer(modifier = Modifier.height(2.dp))
             
             // Page indicators
             Row(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                repeat(5) { index ->
+                repeat(6) { index ->
                     Box(
                         modifier = Modifier
                             .size(if (currentPage == index) 12.dp else 8.dp)
                             .clip(RoundedCornerShape(4.dp))
                             .background(
-                                if (currentPage == index) EcoGreen else EcoTextSecondary.copy(alpha = 0.3f)
+                                if (currentPage == index) colors.green else colors.textSecondary.copy(alpha = 0.3f)
                             )
                     )
                 }
             }
             
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             
             // Continue button
             Button(
                 onClick = onContinue,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(bottom =50.dp)
                     .height(56.dp),
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = EcoGreen,
-                    contentColor = Color.White
+                    containerColor = colors.green,
+                    contentColor = colors.textOnGreen
                 ),
-                shape = RoundedCornerShape(16.dp)
+                shape = RoundedCornerShape(30.dp)
             ) {
                 Text(
-                    text = "Começar Jornada",
+                    text = "Começar Minha Jornada Sustentável",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold
                 )
@@ -167,6 +171,8 @@ fun BannerCard(
     banner: BannerData,
     modifier: Modifier = Modifier
 ) {
+    val colors = LocalDynamicColors.current
+    
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
@@ -248,76 +254,93 @@ data class BannerData(
     val benefits: List<String>
 )
 
+@Composable
 fun getBannerData(): List<BannerData> {
+    val colors = LocalDynamicColors.current
+    
     return listOf(
         BannerData(
-            title = "Tecnologia ESG",
-            description = "Utilizamos tecnologia avançada para monitorar e reduzir sua pegada de carbono de forma inteligente e eficiente.",
-            icon = Icons.Default.Science,
-            iconColor = EcoGreen,
+            title = "🌍 Problema: Pegada de Carbono Descontrolada",
+            description = "Você sabia que cada pessoa produz em média 4.8 toneladas de CO₂ por ano? Sem monitoramento, é impossível saber o real impacto das suas ações no meio ambiente.",
+            icon = Icons.Default.Warning,
+            iconColor = Color(0xFFFF6B6B),
             textColor = Color.White,
-            backgroundColor = EcoGreen.copy(alpha = 0.8f),
+            backgroundColor = Color(0xFFFF6B6B).copy(alpha = 0.8f),
             benefits = listOf(
-                "Monitoramento em tempo real",
-                "Análise de dados precisos",
-                "Relatórios detalhados",
-                "Metas personalizadas"
+                "4.8 toneladas CO₂/ano por pessoa",
+                "Impacto invisível no dia a dia",
+                "Falta de consciência ambiental",
+                "Dificuldade em medir progresso"
             )
         ),
         BannerData(
-            title = "Redução de CO₂",
-            description = "Acompanhe sua jornada sustentável e veja o impacto real das suas escolhas no meio ambiente.",
-            icon = Icons.Default.Eco,
-            iconColor = EcoGreenLight,
+            title = "🚗 Solução: Calculadora de Transporte Inteligente",
+            description = "Monitore suas viagens e descubra o impacto real de cada modalidade de transporte. Dados científicos da API Climatiq para cálculos precisos.",
+            icon = Icons.Default.DirectionsCar,
+            iconColor = Color(0xFF4ECDC4),
             textColor = Color.White,
-            backgroundColor = EcoGreenLight.copy(alpha = 0.8f),
+            backgroundColor = Color(0xFF4ECDC4).copy(alpha = 0.8f),
             benefits = listOf(
-                "Até 1000kg CO₂ reduzidos/ano",
-                "Equivalente a plantar 50 árvores",
-                "Economia de energia significativa",
-                "Contribuição para o planeta"
+                "Cálculos baseados em dados reais",
+                "Comparação entre modalidades",
+                "Filtros por período e região",
+                "Economia de até 2.5T CO₂/ano"
             )
         ),
         BannerData(
-            title = "Vantagens do App",
-            description = "Interface intuitiva e funcionalidades que tornam a sustentabilidade acessível e motivadora.",
-            icon = Icons.Default.Star,
-            iconColor = EcoGreenAccent,
+            title = "⚡ Solução: Monitor de Energia Avançado",
+            description = "Controle seu consumo energético e reduza custos. Análise detalhada por estado, tipo de consumidor e aparelhos específicos.",
+            icon = Icons.Default.EnergySavingsLeaf,
+            iconColor = Color(0xFF45B7D1),
             textColor = Color.White,
-            backgroundColor = EcoGreenAccent.copy(alpha = 0.8f),
+            backgroundColor = Color(0xFF45B7D1).copy(alpha = 0.8f),
             benefits = listOf(
-                "Fácil de usar",
-                "Gamificação sustentável",
+                "Dados regionais específicos",
+                "Análise por tipo de consumidor",
+                "Insights para economia",
+                "Redução de até 40% na conta"
+            )
+        ),
+        BannerData(
+            title = "🍎 Solução: Calculadora de Alimentação Sustentável",
+            description = "Descubra o impacto ambiental dos seus alimentos. Dados nutricionais completos e cálculos de emissão por tipo de alimento.",
+            icon = Icons.Default.Restaurant,
+            iconColor = Color(0xFF96CEB4),
+            textColor = Color.White,
+            backgroundColor = Color(0xFF96CEB4).copy(alpha = 0.8f),
+            benefits = listOf(
+                "Dados nutricionais completos",
+                "Impacto por tipo de alimento",
+                "Filtros por refeição e período",
+                "Redução de até 1.5T CO₂/ano"
+            )
+        ),
+        BannerData(
+            title = "🎯 Solução: Sistema de Metas e Conquistas",
+            description = "Transforme sustentabilidade em um jogo motivador. Metas personalizadas, conquistas e acompanhamento de progresso em tempo real.",
+            icon = Icons.Default.EmojiEvents,
+            iconColor = Color(0xFFFFD93D),
+            textColor = Color.White,
+            backgroundColor = Color(0xFFFFD93D).copy(alpha = 0.8f),
+            benefits = listOf(
+                "Metas personalizadas e realistas",
+                "Sistema de gamificação",
                 "Conquistas e selos",
-                "Comunidade engajada"
+                "Progresso visual em tempo real"
             )
         ),
         BannerData(
-            title = "Comprometimento",
-            description = "Junte-se a milhares de usuários comprometidos com um futuro mais sustentável e responsável.",
-            icon = Icons.Default.Handshake,
-            iconColor = EcoGreen,
+            title = "📊 Resultado: Impacto Real e Mensurável",
+            description = "Veja o resultado das suas ações: árvores salvas, vidas impactadas, CO₂ reduzido. Dados científicos que comprovam seu impacto positivo.",
+            icon = Icons.Default.TrendingUp,
+            iconColor = Color(0xFF6BCF7F),
             textColor = Color.White,
-            backgroundColor = EcoGreen.copy(alpha = 0.7f),
+            backgroundColor = Color(0xFF6BCF7F).copy(alpha = 0.8f),
             benefits = listOf(
-                "Movimento global",
-                "Impacto coletivo",
-                "Futuro sustentável",
-                "Responsabilidade social"
-            )
-        ),
-        BannerData(
-            title = "Inovação Sustentável",
-            description = "Combinação perfeita entre tecnologia de ponta e consciência ambiental para um mundo melhor.",
-            icon = Icons.Default.Lightbulb,
-            iconColor = EcoGreenLight,
-            textColor = Color.White,
-            backgroundColor = EcoGreenLight.copy(alpha = 0.7f),
-            benefits = listOf(
-                "Tecnologia verde",
-                "Inovação responsável",
-                "Soluções inteligentes",
-                "Futuro promissor"
+                "Até 4.8T CO₂ reduzidas/ano",
+                "Equivalente a 240 árvores plantadas",
+                "Impacto em 12+ vidas humanas",
+                "Contribuição real para o planeta"
             )
         )
     )

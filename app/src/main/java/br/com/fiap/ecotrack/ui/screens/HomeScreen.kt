@@ -3,15 +3,13 @@ package br.com.fiap.ecotrack.ui.screens
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.DirectionsWalk
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -22,9 +20,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import br.com.fiap.ecotrack.ui.theme.EcoTrackTheme
 import br.com.fiap.ecotrack.ui.theme.*
+import br.com.fiap.ecotrack.ui.theme.LocalDynamicColors
 import br.com.fiap.ecotrack.model.getAvailableTransportTypes
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,175 +33,461 @@ fun HomeScreen(
     onNavigateToFood: () -> Unit = {},
     onNavigateToProfile: () -> Unit = {}
 ) {
-    Column(
+    val colors = LocalDynamicColors.current
+    var isLoading by remember { mutableStateOf(true) }
+    
+    // Simular carregamento de dados da API
+    LaunchedEffect(Unit) {
+        delay(1000) // Simular delay da API
+        isLoading = false
+    }
+    
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(EcoDark)
-            .padding(start = 16.dp, end = 16.dp, top = 48.dp, bottom = 45.dp),
+            .background(colors.background)
     ) {
-        // Header
+        if (isLoading) {
+            Box(
+                modifier = Modifier.fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(
+                    color = colors.green,
+                    modifier = Modifier.size(48.dp)
+                )
+            }
+        } else {
+            LazyColumn(
+                state = rememberLazyListState(),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 16.dp)
+                    .padding(top = 100.dp)
+                    .padding(bottom = 45.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                // Header de Boas-vindas
+                item {
+                    WelcomeHeaderCard(onNavigateToProfile = onNavigateToProfile)
+                }
+                
+                // Resumo de Impacto Ambiental
+                item {
+                    EnvironmentalImpactCard()
+                }
+                
+                // Estatísticas Rápidas
+                item {
+                    QuickStatsCard()
+                }
+                
+                // Calculadoras Principais
+                item {
+                    MainCalculatorsCard(
+                        onNavigateToTransport = onNavigateToTransport,
+                        onNavigateToEnergy = onNavigateToEnergy,
+                        onNavigateToFood = onNavigateToFood
+                    )
+                }
+                
+                // Metas e Conquistas
+                item {
+                    HomeGoalsAndAchievementsCard()
+                }
+                
+                // Insights e Dicas
+                item {
+                    InsightsCard()
+                }
+                
+                // Resumo de Impacto Total
+                item {
+                    ImpactSummaryCard()
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun WelcomeHeaderCard(
+    onNavigateToProfile: () -> Unit
+) {
+    val colors = LocalDynamicColors.current
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.green.copy(alpha = 0.1f)
+        ),
+        shape = RoundedCornerShape(20.dp)
+    ) {
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Column {
                 Text(
-                    text = "Olá, EcoUser!",
-                    color = EcoTextPrimary,
+                    text = "Olá, EcoWarrior! 🌱",
+                    color = colors.green,
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = "Vamos reduzir sua pegada de carbono",
-                    color = EcoTextSecondary,
+                    text = "Sua jornada sustentável continua",
+                    color = colors.textSecondary,
                     fontSize = 14.sp
+                )
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Hoje você pode fazer a diferença!",
+                    color = colors.textPrimary,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
                 )
             }
             
             IconButton(
                 onClick = onNavigateToProfile,
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(56.dp)
                     .background(
-                        color = EcoGreen,
+                        color = colors.green,
                         shape = CircleShape
                     )
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = "Perfil",
-                    tint = EcoTextOnGreen,
-                    modifier = Modifier.size(24.dp)
+                    tint = colors.textOnGreen,
+                    modifier = Modifier.size(28.dp)
                 )
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Card de resumo de CO2
-        CO2SummaryCard()
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Seção de atividades
-        Text(
-            text = "Suas Atividades",
-            color = EcoTextPrimary,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        // Lista de atividades
-        LazyColumn(
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(getActivityItems()) { activity ->
-                ActivityCard(
-                    activity = activity,
-                    onClick = {
-                        when (activity.title) {
-                            "Transporte" -> onNavigateToTransport()
-                            "Energia" -> onNavigateToEnergy()
-                            "Alimentação" -> onNavigateToFood()
-                        }
-                    }
-                )
-            }
-            
-            // Resumo de Impacto Total
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                Text(
-                    text = "Resumo Rápido de Impacto Total (Aproximado)",
-                    color = EcoTextPrimary,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                ImpactSummaryTable()
             }
         }
     }
 }
 
 @Composable
-fun CO2SummaryCard() {
+fun EnvironmentalImpactCard() {
+    val colors = LocalDynamicColors.current
+    
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = EcoDarkSurface
+            containerColor = colors.surface
         ),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(20.dp)
     ) {
         Column(
             modifier = Modifier.padding(20.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Pegada de CO₂ Hoje",
-                color = EcoTextSecondary,
-                fontSize = 14.sp
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Eco,
+                    contentDescription = "Impacto Ambiental",
+                    tint = colors.green,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Seu Impacto Ambiental Hoje",
+                    color = colors.textPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             
+            // CO₂ Principal
             Text(
-                text = "12.1 kg",
-                color = EcoGreen,
+                text = "12.1 kg CO₂",
+                color = colors.green,
                 fontSize = 36.sp,
                 fontWeight = FontWeight.Bold
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
-            
             Text(
-                text = "Meta: 8.0 kg",
-                color = EcoTextSecondary,
-                fontSize = 12.sp
+                text = "Meta: 8.0 kg CO₂",
+                color = colors.textSecondary,
+                fontSize = 14.sp
             )
             
             Spacer(modifier = Modifier.height(16.dp))
             
             // Barra de progresso
             LinearProgressIndicator(
-            progress = { 0.51f }, // 12.1 / 8.0 = 1.51, mas limitado a 1.0
-            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(8.dp)
-                                .clip(RoundedCornerShape(4.dp)),
-            color = EcoGreen,
-            trackColor = EcoDarkSurfaceVariant,
-            strokeCap = ProgressIndicatorDefaults.LinearStrokeCap,
+                progress = { 0.66f }, // 12.1 / 8.0 = 1.51, mas limitado a 1.0
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(12.dp)
+                    .clip(RoundedCornerShape(6.dp)),
+                color = colors.green,
+                trackColor = colors.surfaceVariant,
+                strokeCap = ProgressIndicatorDefaults.LinearStrokeCap
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                ImpactStat(
+                    value = "4.1 kg",
+                    label = "Acima da Meta",
+                    color = colors.warning,
+                    icon = Icons.Default.TrendingUp
+                )
+                ImpactStat(
+                    value = "2.3 árvores",
+                    label = "Equivalente",
+                    color = colors.green,
+                    icon = Icons.Default.Park
+                )
+                ImpactStat(
+                    value = "1.2 vidas",
+                    label = "Impactadas",
+                    color = colors.greenLight,
+                    icon = Icons.Default.Favorite
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ImpactStat(
+    value: String,
+    label: String,
+    color: Color,
+    icon: ImageVector
+) {
+    val colors = LocalDynamicColors.current
+    
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = color,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = value,
+            color = color,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = label,
+            color = colors.textSecondary,
+            fontSize = 10.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun QuickStatsCard() {
+    val colors = LocalDynamicColors.current
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.surface
+        ),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Analytics,
+                    contentDescription = "Estatísticas",
+                    tint = colors.greenLight,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Estatísticas Rápidas",
+                    color = colors.textPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                QuickStat(
+                    value = "7 dias",
+                    label = "Dias Ativo",
+                    color = colors.green,
+                    icon = Icons.Default.CalendarToday
+                )
+                QuickStat(
+                    value = "3 metas",
+                    label = "Em Progresso",
+                    color = colors.greenLight,
+                    icon = Icons.Default.Flag
+                )
+                QuickStat(
+                    value = "5 selos",
+                    label = "Conquistados",
+                    color = colors.greenAccent,
+                    icon = Icons.Default.EmojiEvents
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun QuickStat(
+    value: String,
+    label: String,
+    color: Color,
+    icon: ImageVector
+) {
+    val colors = LocalDynamicColors.current
+    
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = color,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = value,
+            color = color,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = label,
+            color = colors.textSecondary,
+            fontSize = 10.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun MainCalculatorsCard(
+    onNavigateToTransport: () -> Unit,
+    onNavigateToEnergy: () -> Unit,
+    onNavigateToFood: () -> Unit
+) {
+    val colors = LocalDynamicColors.current
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.surface
+        ),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Calculate,
+                    contentDescription = "Calculadoras",
+                    tint = colors.greenAccent,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Calculadoras Principais",
+                    color = colors.textPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
             
             Text(
-                text = "Você está 4.1kg acima da meta",
-                color = EcoWarning,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center
+                text = "Use dados científicos da API Climatiq para cálculos precisos:",
+                color = colors.textSecondary,
+                fontSize = 14.sp,
+                lineHeight = 20.sp
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Calculadoras
+            CalculatorItem(
+                icon = Icons.Default.DirectionsCar,
+                title = "Transporte",
+                description = "Calcule emissões de viagens",
+                co2Amount = "7.8 kg",
+                color = colors.green,
+                onClick = onNavigateToTransport
+            )
+            
+            CalculatorItem(
+                icon = Icons.Default.EnergySavingsLeaf,
+                title = "Energia",
+                description = "Monitore consumo energético",
+                co2Amount = "2.1 kg",
+                color = colors.greenLight,
+                onClick = onNavigateToEnergy
+            )
+            
+            CalculatorItem(
+                icon = Icons.Default.Restaurant,
+                title = "Alimentação",
+                description = "Impacto das suas refeições",
+                co2Amount = "2.2 kg",
+                color = colors.greenAccent,
+                onClick = onNavigateToFood
             )
         }
     }
 }
 
 @Composable
-fun ActivityCard(
-    activity: ActivityItem,
+fun CalculatorItem(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    co2Amount: String,
+    color: Color,
     onClick: () -> Unit
 ) {
+    val colors = LocalDynamicColors.current
+    
     Card(
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
         onClick = onClick,
         colors = CardDefaults.cardColors(
-            containerColor = EcoDarkSurface
+            containerColor = color.copy(alpha = 0.1f)
         ),
         shape = RoundedCornerShape(12.dp)
     ) {
@@ -211,9 +496,9 @@ fun ActivityCard(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
-                imageVector = activity.icon,
-                contentDescription = activity.title,
-                tint = activity.color,
+                imageVector = icon,
+                contentDescription = title,
+                tint = color,
                 modifier = Modifier.size(32.dp)
             )
             
@@ -221,22 +506,22 @@ fun ActivityCard(
             
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = activity.title,
-                    color = EcoTextPrimary,
+                    text = title,
+                    color = colors.textPrimary,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = activity.subtitle,
-                    color = EcoTextSecondary,
+                    text = description,
+                    color = colors.textSecondary,
                     fontSize = 12.sp
                 )
             }
             
             Text(
-                text = activity.co2Amount,
-                color = activity.color,
-                fontSize = 14.sp,
+                text = co2Amount,
+                color = color,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
             
@@ -245,87 +530,343 @@ fun ActivityCard(
             Icon(
                 imageVector = Icons.Default.ChevronRight,
                 contentDescription = "Ir para",
-                tint = EcoTextSecondary,
+                tint = colors.textSecondary,
                 modifier = Modifier.size(20.dp)
             )
         }
     }
 }
 
-data class ActivityItem(
-    val title: String,
-    val subtitle: String,
-    val icon: ImageVector,
-    val color: Color,
-    val co2Amount: String
-)
-
 @Composable
-fun ImpactSummaryTable() {
+fun HomeGoalsAndAchievementsCard() {
+    val colors = LocalDynamicColors.current
+    
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = EcoDarkSurface
+            containerColor = colors.surface
         ),
-        shape = RoundedCornerShape(16.dp)
+        shape = RoundedCornerShape(20.dp)
     ) {
         Column(
             modifier = Modifier.padding(20.dp)
         ) {
-            // Header da tabela
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "Ação",
-                    color = EcoTextPrimary,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(2f)
+                Icon(
+                    imageVector = Icons.Default.EmojiEvents,
+                    contentDescription = "Metas e Conquistas",
+                    tint = colors.green,
+                    modifier = Modifier.size(24.dp)
                 )
+                Spacer(modifier = Modifier.width(12.dp))
                 Text(
-                    text = "1 Semana",
-                    color = EcoTextPrimary,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = "1 Mês",
-                    color = EcoTextPrimary,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
-                )
-                Text(
-                    text = "1 Ano",
-                    color = EcoTextPrimary,
-                    fontSize = 12.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
+                    text = "Metas e Conquistas",
+                    color = colors.textPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
                 )
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(16.dp))
             
-            // Linha separadora
-            HorizontalDivider(
-                color = EcoTextSecondary.copy(alpha = 0.3f),
-                thickness = 1.dp
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                GoalStat(
+                    value = "3",
+                    label = "Metas Ativas",
+                    color = colors.green,
+                    icon = Icons.Default.Flag
+                )
+                GoalStat(
+                    value = "2",
+                    label = "Concluídas",
+                    color = colors.success,
+                    icon = Icons.Default.CheckCircle
+                )
+                GoalStat(
+                    value = "5",
+                    label = "Selos Ganhos",
+                    color = colors.greenAccent,
+                    icon = Icons.Default.EmojiEvents
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                text = "🎯 Meta da Semana: Reduzir 2kg de CO₂",
+                color = colors.green,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
             )
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             
-            // Dados da tabela
-            getImpactData().forEach { impactItem ->
-                ImpactTableRow(impactItem = impactItem)
-                if (impactItem != getImpactData().last()) {
-                    Spacer(modifier = Modifier.height(8.dp))
-                }
+            LinearProgressIndicator(
+                progress = { 0.6f },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(4.dp)),
+                color = colors.green,
+                trackColor = colors.surfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "60% concluído - 1.2kg restantes",
+                color = colors.textSecondary,
+                fontSize = 12.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun GoalStat(
+    value: String,
+    label: String,
+    color: Color,
+    icon: ImageVector
+) {
+    val colors = LocalDynamicColors.current
+    
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = label,
+            tint = color,
+            modifier = Modifier.size(20.dp)
+        )
+        Spacer(modifier = Modifier.height(4.dp))
+        Text(
+            text = value,
+            color = color,
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = label,
+            color = colors.textSecondary,
+            fontSize = 10.sp,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+fun InsightsCard() {
+    val colors = LocalDynamicColors.current
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.surface
+        ),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Lightbulb,
+                    contentDescription = "Insights",
+                    tint = colors.greenLight,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Insights e Dicas",
+                    color = colors.textPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            InsightItem(
+                icon = Icons.Default.DirectionsCar,
+                title = "Dica de Transporte",
+                description = "Use transporte público 2x por semana e reduza 1.5kg CO₂",
+                color = colors.green
+            )
+            
+            InsightItem(
+                icon = Icons.Default.EnergySavingsLeaf,
+                title = "Dica de Energia",
+                description = "Desligue aparelhos em standby e economize 0.8kg CO₂",
+                color = colors.greenLight
+            )
+            
+            InsightItem(
+                icon = Icons.Default.Restaurant,
+                title = "Dica de Alimentação",
+                description = "Reduza carne vermelha 1x por semana e economize 2.1kg CO₂",
+                color = colors.greenAccent
+            )
+        }
+    }
+}
+
+@Composable
+fun InsightItem(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    color: Color
+) {
+    val colors = LocalDynamicColors.current
+    
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.Top
+    ) {
+        Icon(
+            imageVector = icon,
+            contentDescription = title,
+            tint = color,
+            modifier = Modifier.size(20.dp)
+        )
+        
+        Spacer(modifier = Modifier.width(12.dp))
+        
+        Column {
+            Text(
+                text = title,
+                color = colors.textPrimary,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium
+            )
+            Text(
+                text = description,
+                color = colors.textSecondary,
+                fontSize = 12.sp,
+                lineHeight = 16.sp
+            )
+        }
+    }
+}
+
+@Composable
+fun ImpactSummaryCard() {
+    val colors = LocalDynamicColors.current
+    
+    Card(
+        modifier = Modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = colors.surface
+        ),
+        shape = RoundedCornerShape(20.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(20.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.TrendingUp,
+                    contentDescription = "Resumo de Impacto",
+                    tint = colors.green,
+                    modifier = Modifier.size(24.dp)
+                )
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = "Resumo de Impacto Total",
+                    color = colors.textPrimary,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            Text(
+                text = "Dados baseados em cálculos científicos da API Climatiq:",
+                color = colors.textSecondary,
+                fontSize = 12.sp,
+                fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+            )
+            
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Tabela de impacto
+            ImpactTable()
+        }
+    }
+}
+
+@Composable
+fun ImpactTable() {
+    val colors = LocalDynamicColors.current
+    
+    Column {
+        // Header da tabela
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = "Ação",
+                color = colors.textPrimary,
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(2f)
+            )
+            Text(
+                text = "1 Semana",
+                color = colors.textPrimary,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "1 Mês",
+                color = colors.textPrimary,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "1 Ano",
+                color = colors.textPrimary,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        // Linha separadora
+        HorizontalDivider(
+            color = colors.textSecondary.copy(alpha = 0.3f),
+            thickness = 1.dp
+        )
+        
+        Spacer(modifier = Modifier.height(8.dp))
+        
+        // Dados da tabela
+        getImpactData().forEach { impactItem ->
+            ImpactTableRow(impactItem = impactItem)
+            if (impactItem != getImpactData().last()) {
+                Spacer(modifier = Modifier.height(4.dp))
             }
         }
     }
@@ -333,6 +874,8 @@ fun ImpactSummaryTable() {
 
 @Composable
 fun ImpactTableRow(impactItem: ImpactItem) {
+    val colors = LocalDynamicColors.current
+    
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -346,13 +889,13 @@ fun ImpactTableRow(impactItem: ImpactItem) {
                 imageVector = impactItem.icon,
                 contentDescription = impactItem.action,
                 tint = impactItem.color,
-                modifier = Modifier.size(16.dp)
+                modifier = Modifier.size(14.dp)
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(6.dp))
             Text(
                 text = impactItem.action,
-                color = EcoTextPrimary,
-                fontSize = 12.sp,
+                color = colors.textPrimary,
+                fontSize = 10.sp,
                 fontWeight = FontWeight.Medium
             )
         }
@@ -360,8 +903,8 @@ fun ImpactTableRow(impactItem: ImpactItem) {
         // 1 Semana
         Text(
             text = impactItem.oneWeek,
-            color = EcoTextSecondary,
-            fontSize = 11.sp,
+            color = colors.textSecondary,
+            fontSize = 9.sp,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
@@ -369,8 +912,8 @@ fun ImpactTableRow(impactItem: ImpactItem) {
         // 1 Mês
         Text(
             text = impactItem.oneMonth,
-            color = EcoTextSecondary,
-            fontSize = 11.sp,
+            color = colors.textSecondary,
+            fontSize = 9.sp,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
@@ -378,8 +921,8 @@ fun ImpactTableRow(impactItem: ImpactItem) {
         // 1 Ano
         Text(
             text = impactItem.oneYear,
-            color = EcoTextSecondary,
-            fontSize = 11.sp,
+            color = colors.textSecondary,
+            fontSize = 9.sp,
             modifier = Modifier.weight(1f),
             textAlign = TextAlign.Center
         )
@@ -445,49 +988,6 @@ fun getImpactData(): List<ImpactItem> {
             oneWeek = "~3 kg",
             oneMonth = "~15 kg",
             oneYear = "~180 kg"
-        ),
-        ImpactItem(
-            action = "Reflorestamento",
-            icon = Icons.Default.Park,
-            color = EcoGreen,
-            oneWeek = "-",
-            oneMonth = "~80 kg",
-            oneYear = "~1000 kg"
-        ),
-        ImpactItem(
-            action = "Consumo consciente",
-            icon = Icons.Default.ShoppingCart,
-            color = EcoGreenLight,
-            oneWeek = "~5-10 kg",
-            oneMonth = "~40 kg",
-            oneYear = "~500 kg"
-        )
-    )
-}
-
-fun getActivityItems(): List<ActivityItem> {
-    val transportTypes = getAvailableTransportTypes()
-    return listOf(
-        ActivityItem(
-            title = "Transporte",
-            subtitle = "Carro, ônibus, trem, bicicleta",
-            icon = transportTypes[0].icon, // Carro como ícone principal
-            color = transportTypes[0].color,
-            co2Amount = "7.8 kg"
-        ),
-        ActivityItem(
-            title = "Energia",
-            subtitle = "Eletricidade, gás",
-            icon = Icons.Default.ElectricalServices,
-            color = EcoGreenLight,
-            co2Amount = "2.1 kg"
-        ),
-        ActivityItem(
-            title = "Alimentação",
-            subtitle = "Refeições e bebidas",
-            icon = Icons.Default.Restaurant,
-            color = EcoGreenAccent,
-            co2Amount = "2.2 kg"
         )
     )
 }
